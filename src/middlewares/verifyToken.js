@@ -27,7 +27,6 @@ function verifyToken(req, res, next) {
   Verify(token)
     .then((decoded) => {
       req.roleUser = decoded.role;
-      //Make that de id of the user is in the request
       req.user = decoded.id;
       next();
     })
@@ -38,4 +37,13 @@ function verifyToken(req, res, next) {
     });
 }
 
-export default verifyToken;
+async function tokenPasswordReset(token) {
+  try {
+    await jwt.verify(token, config.secretKey);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export { verifyToken, tokenPasswordReset };

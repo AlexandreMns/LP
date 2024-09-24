@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import config from "../../config.js";
 
@@ -15,10 +14,6 @@ const decodeToken = (token) => {
   });
 };
 
-const comparePassword = (password, hash) => {
-  return bcrypt.compare(password, hash);
-};
-
 const createToken = (user) => {
   let token = jwt.sign(
     { id: user._id, name: user.name, role: user.role },
@@ -30,4 +25,11 @@ const createToken = (user) => {
   return { auth: true, token: token };
 };
 
-export { decodeToken, comparePassword, createToken };
+const createTokenPasswordReset = (user) => {
+  let token = jwt.sign({ id: user._id }, config.secretKey, {
+    expiresIn: 300,
+  });
+  return token;
+};
+
+export { decodeToken, createToken, createTokenPasswordReset };

@@ -1,13 +1,17 @@
 import { User, roles } from "../../models/usersModel.js";
-import bcrypt from "bcrypt";
-import { createToken } from "../../utils/tokenUtil.js";
+import { tokenPasswordReset } from "../../middlewares/verifyToken.js";
+import {
+  createToken,
+  createTokenPasswordReset,
+} from "../../utils/tokenUtil.js";
+import { comparePassword, createPassword } from "../../utils/passwordUtil.js";
 import config from "../../../config.js";
 
 export class UserService {
   async register(data) {
     try {
       const password = data.password;
-      const hashPassword = await bcrypt.hash(password, config.saltRounds);
+      const hashPassword = await createPassword(password);
 
       const userExists = await User.findOne({ email: data.email });
       if (userExists) {
@@ -21,7 +25,7 @@ export class UserService {
         role: roles.USER,
       });
       await user.save();
-      const token = createToken(user, config.expiresIn);
+      const token = createToken(user);
       const userToken = {
         token: token.token,
         role: user.role,
@@ -40,7 +44,7 @@ export class UserService {
       if (!user) {
         return "User not found";
       }
-      const passwordIsValid = await bcrypt.compare(
+      const passwordIsValid = await comparePassword(
         data.password,
         user.password
       );
@@ -58,29 +62,11 @@ export class UserService {
     }
   }
 
-  async allUsers(data) {
-    try {
-      console.log(data);
-      const users = await User.find();
-      const payload = users.map((user) => {
-        return {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
-      });
-      return payload;
-    } catch (error) {
-      throw new Error("Problem in fetching users " + error);
-    }
-  }
-
   async me(data) {
     try {
       const userId = data;
       const user = await User.findById(userId);
-      // Questionavel if
+      // Questionable if
       if (!user) {
         return "User not found";
       }
@@ -94,31 +80,38 @@ export class UserService {
       throw new Error("Problem in fetching user " + error);
     }
   }
+
   //Forgot password needs to be fixed, it needs to work via a token send in the email
   async forgotPassword(data) {
     try {
       const userId = data.userId;
       const user = await User.findOne({ _id: userId });
+
+      if (user.resetPasswordToken === undefined) {
+        return "No token found";
+      }
+
+      const verifycation = await tokenPasswordReset(user.resetPasswordToken);
+      if (!verifycation) {
+        return "Token expired";
+      }
+
       const newPassword = data.newPassword;
       const confirmPassword = data.confirmPassword;
-
-      console.log(newPassword, +"   " + confirmPassword);
 
       if (newPassword !== confirmPassword) {
         return "Passwords do not match";
       }
 
-      const oldPassword = await bcrypt.compare(newPassword, user.password);
+      const oldPassword = await comparePassword(newPassword, user.password);
       if (oldPassword) {
         return "New password cannot be the same as the old password";
       }
 
       try {
-        user.password = await bcrypt.hash(newPassword, config.saltRounds);
-        /* Make sure to remove the reset password token and expiry date
+        user.password = await createPassword(newPassword);
         user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        */
+
         await user.save();
         return "Password updated successfully";
       } catch (err) {
@@ -129,25 +122,18 @@ export class UserService {
     }
   }
 
-  async changeRoles(data) {
+  async forgotPasswordToken(data) {
     try {
-      const userId = data.userId;
+      const userId = data;
       const user = await User.findOne({ _id: userId });
       if (!user) {
         return "User not found";
       }
-      const newRole = data.newRole;
-      if (newRole === user.role) {
-        return "User already has this role";
-      }
-      console.log(newRole);
-
-      user.role = newRole;
+      user.resetPasswordToken = createTokenPasswordReset(user);
       await user.save();
-      console.log(user);
-      return "Role changed successfully";
+      //user.resetPasswordExpires = Date.now() + 300000; // 5 min
     } catch (error) {
-      throw new Error("Problem in changing roles " + error);
+      throw new Error("Problem in forgot password token " + error);
     }
   }
 }

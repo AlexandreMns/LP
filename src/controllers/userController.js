@@ -36,17 +36,6 @@ export class UserController {
     }
   };
 
-  allUsers = async (req, res) => {
-    try {
-      const response = await this.userServices.allUsers(req.user);
-      res.status(HttpStatus.OK).json(response);
-    } catch (error) {
-      res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
-    }
-  };
-
   me = async (req, res) => {
     try {
       const response = await this.userServices.me(req.user);
@@ -74,13 +63,9 @@ export class UserController {
     }
   };
 
-  changeRoles = async (req, res) => {
+  forgotPasswordToken = async (req, res) => {
     try {
-      const data = {
-        userId: req.body.userId,
-        newRole: req.body.newRole,
-      };
-      const response = await this.userServices.changeRoles(data);
+      const response = await this.userServices.forgotPasswordToken(req.user);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res
