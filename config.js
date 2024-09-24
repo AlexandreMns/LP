@@ -16,7 +16,7 @@ const config = {
   saltRounds: Number(process.env.SALT_ROUNDS),
 
   //Expiration time for the JWT
-  expiresIn: process.env.EXPIRES_IN,
+  expiresIn: Number(process.env.EXPIRES_IN),
 };
 
 export default config;

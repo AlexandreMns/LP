@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
-import { config } from "../config";
+import config from "../../config.js";
+import { HttpStatus } from "../utils/httpStatus.js";
 
 function Verify(token) {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, config.secretKey, (err, decoded) => {
       if (err) {
         console.log("Error:" + err);
         reject();
@@ -14,22 +15,27 @@ function Verify(token) {
 }
 
 function verifyToken(req, res, next) {
-  let token = req.headers["x-access-token"];
+  const authorize = req.header("authorization");
+  const token = authorize && authorize.split(" ")[1];
 
   if (!token) {
-    return res.status(400).send({ auth: false, message: "No token provided" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ auth: false, message: "No token provided" });
   }
 
   Verify(token)
     .then((decoded) => {
       req.roleUser = decoded.role;
+      //Make that de id of the user is in the request
+      req.user = decoded.id;
       next();
     })
     .catch(() => {
       res
-        .status(401)
+        .status(HttpStatus.UNAUTHORIZED)
         .send({ auth: false, message: "Failed to authenticate token" });
     });
 }
 
-export { verifyToken };
+export default verifyToken;

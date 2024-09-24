@@ -7,9 +7,9 @@ const roles = {
 };
 
 const roleHierarchy = {
-  user: 1,
-  moderator: 2,
-  admin: 3,
+  [roles.USER]: 1,
+  [roles.MODERATOR]: 2,
+  [roles.ADMIN]: 3,
 };
 
 const UserSchema = new mongoose.Schema({
@@ -26,6 +26,12 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
   role: { type: String, enum: Object.values(roles), default: roles.USER },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
 });
 
 const User = mongoose.model("User", UserSchema);

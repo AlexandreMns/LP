@@ -1,40 +1,41 @@
 import { decodeToken } from "../utils/tokenUtil.js";
-import { roleHierarchy } from "../models/Users.js";
+import { roleHierarchy } from "../models/usersModel.js";
+import { HttpStatus } from "../utils/httpStatus.js";
 
 const authorize = (requiredRole) => {
   return async (req, res, next) => {
     try {
-      // Extract the token from the 'x-access-token' header
-      const token = req.header("x-access-token");
+      const authorize = req.header("authorization");
+      const token = authorize && authorize.split(" ")[1];
 
       if (!token) {
         return res
-          .status(401)
+          .status(HttpStatus.UNAUTHORIZED)
           .json({ message: "Access denied. Token not provided." });
       }
       // Decode the token
       const decoded = await decodeToken(token);
-
-      // Extract the user's role from the decoded token
       const userRole = decoded.role;
 
       if (!userRole) {
         return res
-          .status(403)
+          .status(HttpStatus.UNAUTHORIZED)
           .json({ message: "User role not found in token." });
       }
 
       // Check if the user has the required role by comparing with roleHierarchy
       if (roleHierarchy[userRole] >= roleHierarchy[requiredRole]) {
-        return next(); // Authorized, proceed to the next middleware or controller
+        return next(); // Authorized
       } else {
         return res
-          .status(403)
+          .status(HttpStatus.FORBIDDEN)
           .json({ message: "Permission denied. Insufficient role." });
       }
     } catch (error) {
       // Handle token decoding errors or others
-      return res.status(500).json({ message: error });
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error });
     }
   };
 };

@@ -1,4 +1,4 @@
-import User from "../models/Users.js";
+import User from "../models/usersModel.js";
 
 const ValidateToken = async (Newtoken, req, res, next) => {
   try {
@@ -23,3 +23,5 @@ const ValidateToken = async (Newtoken, req, res, next) => {
 };
 
 export default ValidateToken;
+
+//Não funcional aindas

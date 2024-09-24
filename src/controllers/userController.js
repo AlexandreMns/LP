@@ -1,3 +1,5 @@
+import { HttpStatus } from "../utils/httpStatus.js";
+
 export class UserController {
   constructor(userServices) {
     this.userServices = userServices;
@@ -11,9 +13,11 @@ export class UserController {
         password: req.body.password,
       };
       const response = await this.userServices.register(data);
-      res.status(200).json(response);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
     }
   };
 
@@ -24,18 +28,64 @@ export class UserController {
         password: req.body.password,
       };
       const response = await this.userServices.login(data);
-      res.status(200).json(response);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
     }
   };
 
   allUsers = async (req, res) => {
     try {
-      const response = await this.userServices.allUsers();
-      res.status(200).json(response);
+      const response = await this.userServices.allUsers(req.user);
+      res.status(HttpStatus.OK).json(response);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
+
+  me = async (req, res) => {
+    try {
+      const response = await this.userServices.me(req.user);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
+
+  forgotPassword = async (req, res) => {
+    try {
+      const data = {
+        newPassword: req.body.newPassword,
+        confirmPassword: req.body.confirmPassword,
+        userId: req.user,
+      };
+      const response = await this.userServices.forgotPassword(data);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
+
+  changeRoles = async (req, res) => {
+    try {
+      const data = {
+        userId: req.body.userId,
+        newRole: req.body.newRole,
+      };
+      const response = await this.userServices.changeRoles(data);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
     }
   };
 }
