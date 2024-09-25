@@ -65,7 +65,10 @@ export class UserController {
 
   forgotPasswordToken = async (req, res) => {
     try {
-      const response = await this.userServices.forgotPasswordToken(req.user);
+      const data = {
+        email: req.body.email,
+      };
+      const response = await this.userServices.forgotPasswordToken(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res

@@ -80,12 +80,13 @@ export class UserService {
       throw new Error("Problem in fetching user " + error);
     }
   }
-
+  //
   //Forgot password needs to be fixed, it needs to work via a token send in the email
+  //
   async forgotPassword(data) {
     try {
       const userId = data.userId;
-      const user = await User.findOne({ _id: userId });
+      const user = await User.findById(userId);
 
       if (user.resetPasswordToken === undefined) {
         return "No token found";
@@ -124,16 +125,25 @@ export class UserService {
 
   async forgotPasswordToken(data) {
     try {
-      const userId = data;
-      const user = await User.findOne({ _id: userId });
+      const userEmail = data.email;
+      const user = await User.findOne({ email: userEmail });
       if (!user) {
         return "User not found";
       }
       user.resetPasswordToken = createTokenPasswordReset(user);
       await user.save();
-      //user.resetPasswordExpires = Date.now() + 300000; // 5 min
+      //Temporario
+      const token = {
+        token: user.resetPasswordToken,
+      };
+      return token;
+      // return "Token sent to email";
     } catch (error) {
       throw new Error("Problem in forgot password token " + error);
     }
   }
+
+  //
+  //
+  //
 }
