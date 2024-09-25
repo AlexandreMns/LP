@@ -1,15 +1,9 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const roles = {
-  USER: "user",
-  MODERATOR: "moderator",
-  ADMIN: "admin",
-};
-
-const roleHierarchy = {
-  [roles.USER]: 1,
-  [roles.MODERATOR]: 2,
-  [roles.ADMIN]: 3,
+  CLIENT: 'client',
+  AGENT: 'agent',
+  ADMIN: 'admin',
 };
 
 const UserSchema = new mongoose.Schema({
@@ -17,15 +11,20 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  dateOfBirth: {
+    type: Date,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
+    unique: true, // email must be unique
   },
-  password: {
+    password: {
     type: String,
     required: true,
   },
-  role: { type: String, enum: Object.values(roles), default: roles.USER },
+  role: { type: String, enum: Object.values(roles), default: roles.CLIENT },
   resetPasswordToken: {
     type: String,
   },

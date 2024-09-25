@@ -39,4 +39,36 @@ export class AdminService {
       throw new Error("Problem in changing roles " + error);
     }
   }
+
+  async getDashboardData() {
+    // Exemplo de lógica para obter dados do dashboard
+    const totalUsers = await User.countDocuments();
+    const totalImoveis = await Imovel.countDocuments();
+    const totalClientes = await User.countDocuments({ role: 'client' });
+    const totalAgentes = await User.countDocuments({ role: 'agent' });
+    const totalAdmins = await User.countDocuments({ role: 'admin' });
+
+    return {
+      totalUsers,
+      totalImoveis,
+      totalClientes,
+      totalAgentes,
+      totalAdmins,
+    };
+  }
+
+  async createUser(userData) {
+    const newUser = new User(userData);
+    await newUser.save();
+    return newUser;
+  }
+
+  async deleteUser(userId) {
+    const result = await User.deleteOne({ _id: userId });
+    if (result.deletedCount === 0) {
+      throw new Error('User not found');
+    }
+    return { message: 'User deleted successfully' };
+  }
+
 }

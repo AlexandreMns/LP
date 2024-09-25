@@ -10,7 +10,6 @@ const app = express();
 db();
 
 app.use(cors());
-
 app.use(express.json());
 
 for (const route of routes) {

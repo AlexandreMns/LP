@@ -29,4 +29,15 @@ router.put(
   adminController.changeRoles
 );
 
+// Get dashboard data
+router.get('/dashboard', verifyToken, authorize(roles.ADMIN), adminController.getDashboard);
+
+// Create a new user
+router.post('/create-user', verifyToken, authorize(roles.ADMIN), adminController.createUser);
+
+// Delete a user
+router.delete('/delete-user/:userId', verifyToken, authorize(roles.ADMIN), adminController.deleteUser);
+
+
+
 export default router;
