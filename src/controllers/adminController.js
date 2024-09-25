@@ -6,7 +6,6 @@ export class AdminController {
   }
 
   allUsers = async (req, res) => {
-    console.log("All users");
     try {
       const response = await this.adminController.allUsers(req.user);
       res.status(HttpStatus.OK).json(response);
