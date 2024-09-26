@@ -1,5 +1,4 @@
 import { decodeToken } from "../utils/tokenUtil.js";
-import { roleHierarchy } from "../models/usersModel.js";
 import { HttpStatus } from "../utils/httpStatus.js";
 
 const authorize = (requiredRole) => {

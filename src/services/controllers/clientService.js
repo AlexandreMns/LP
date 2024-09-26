@@ -1,4 +1,4 @@
-import { User } from '../models/usersModel.js';
+import { User } from '../../models/usersModel.js';
 
 export class ClientService {
   async getProfile(userId) {

@@ -1,5 +1,5 @@
-import { User } from '../models/usersModel.js';
-import { Property } from '../models/propertyModel.js';
+import { User } from '../../models/usersModel.js';
+import { Property } from '../../models/propertyModel.js';
 
 export class AgentService {
   async getProfile(userId) {

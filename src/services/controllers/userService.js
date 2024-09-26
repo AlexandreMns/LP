@@ -21,6 +21,7 @@ export class UserService {
       const user = new User({
         name: data.name,
         email: data.email,
+        dateOfBirth: data.dateOfBirth,
         password: hashPassword,
         role: roles.USER,
       });
