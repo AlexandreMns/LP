@@ -1,13 +1,13 @@
 import { HttpStatus } from "../utils/httpStatus.js";
 
 export class AdminController {
-  constructor(adminService) {
-    this.adminService = adminService;
+  constructor(adminController) {
+    this.adminController = adminController;
   }
 
   allUsers = async (req, res) => {
     try {
-      const response = await this.adminService.allUsers();
+      const response = await this.adminController.allUsers();
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res
@@ -22,7 +22,7 @@ export class AdminController {
         userId: req.body.userId,
         newRole: req.body.newRole,
       };
-      const response = await this.adminService.changeRoles(data);
+      const response = await this.adminController.changeRoles(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res

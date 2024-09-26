@@ -34,11 +34,9 @@ export class AdminService {
       if (newRole === user.role) {
         return "User already has this role";
       }
-      console.log(newRole);
 
       user.role = newRole;
       await user.save();
-      console.log(user);
       return "Role changed successfully";
     } catch (error) {
       throw new Error("Problem in changing roles " + error);
@@ -49,9 +47,9 @@ export class AdminService {
     // Exemplo de lógica para obter dados do dashboard
     const totalUsers = await User.countDocuments();
     const totalImoveis = await Imovel.countDocuments();
-    const totalClientes = await User.countDocuments({ role: 'client' });
-    const totalAgentes = await User.countDocuments({ role: 'agent' });
-    const totalAdmins = await User.countDocuments({ role: 'admin' });
+    const totalClientes = await User.countDocuments({ role: "client" });
+    const totalAgentes = await User.countDocuments({ role: "agent" });
+    const totalAdmins = await User.countDocuments({ role: "admin" });
 
     return {
       totalUsers,
@@ -71,9 +69,8 @@ export class AdminService {
   async deleteUser(userId) {
     const result = await User.deleteOne({ _id: userId });
     if (result.deletedCount === 0) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
-    return { message: 'User deleted successfully' };
+    return { message: "User deleted successfully" };
   }
-
 }

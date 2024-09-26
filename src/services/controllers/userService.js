@@ -92,7 +92,6 @@ export class UserService {
       if (user.resetPasswordToken === undefined) {
         return "No token found";
       }
-
       const verifycation = await tokenPasswordReset(user.resetPasswordToken);
       if (!verifycation) {
         return "Token expired";
