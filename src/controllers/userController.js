@@ -10,6 +10,7 @@ export class UserController {
       const data = {
         name: req.body.name,
         email: req.body.email,
+        dateOfBirth: new Date(req.body.dateOfBirth).toISOString(), // Converte a data de nascimento para o formato ISO 8601
         password: req.body.password,
       };
       const response = await this.userServices.register(data);
