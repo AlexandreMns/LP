@@ -1,29 +1,7 @@
-import { User } from "../../models/usersModel.js";
+import { roles, User } from "../../models/usersModel.js";
 import { dataRole } from "../../utils/dataUtil.js";
 
 export class AdminService {
-  async allUsers() {
-    try {
-      const users = await User.find();
-      const payload = users.map((user) => {
-        return {
-          id: user._id,
-          name: user.name,
-          dateOfBirth: user.dateOfBirth,
-          email: user.email,
-          role: user.role,
-          phone: user.phone,
-          agentLicense: user.agentLicense,
-          employer: user.employer,
-          properties: user.properties,
-        };
-      });
-      return payload;
-    } catch (error) {
-      throw new Error("Problem in fetching users " + error);
-    }
-  }
-
   async changeRoles(data) {
     try {
       const userId = data.userId;
@@ -92,6 +70,38 @@ export class AdminService {
       return payload;
     } catch (error) {
       throw new Error("Problem in fetching user info " + error);
+    }
+  }
+
+  async createAdmin(data) {
+    try {
+      const user = await User.findOne({ email: data.email });
+      if (user) {
+        return "User already exists"; // mesmo com este erro da 201 corrigir para 409
+      }
+      const roleAdd = {
+        role: roles.ADMIN,
+      };
+      const newData = Object.assign(data, roleAdd);
+      const newAdmin = new User(newData);
+      await newAdmin.save();
+      return newAdmin;
+    } catch (error) {
+      throw new Error("Problem in creating admin " + error);
+    }
+  }
+
+  async allUsers() {
+    try {
+      const users = await User.find();
+      const payload = [];
+      for (let i = 0; i < users.length; i++) {
+        let payloadData = await dataRole(users[i]._id);
+        payload.push(payloadData);
+      }
+      return payload;
+    } catch (error) {
+      throw new Error("Problem in fetching users " + error);
     }
   }
 }

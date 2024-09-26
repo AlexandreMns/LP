@@ -1,3 +1,4 @@
+import { dataRole } from "../utils/dataUtil.js";
 import { HttpStatus } from "../utils/httpStatus.js";
 
 export class UserController {
@@ -71,6 +72,49 @@ export class UserController {
       };
       const response = await this.userServices.forgotPasswordToken(data);
       res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
+
+  allProperties = async (req, res) => {
+    try {
+      // Desestruturação dos parâmetros da query diretamente do req.query
+      const {
+        page = 1,
+        limit = 10,
+        sort = "price",
+        type,
+        search,
+        bedrooms,
+        bathrooms,
+        minPrice,
+        maxPrice,
+        minSize,
+        maxSize,
+        features,
+      } = req.query;
+
+      // Passar os parâmetros para a função de serviço
+      const data = {
+        page,
+        limit,
+        sort,
+        type,
+        search,
+        bedrooms,
+        bathrooms,
+        minPrice,
+        maxPrice,
+        minSize,
+        maxSize,
+        features,
+      };
+      // Chamada do serviço com os dados processados
+      const response = await this.userServices.allProperties(data);
+      res.status(HttpStatus.OK).json({ response });
     } catch (error) {
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)

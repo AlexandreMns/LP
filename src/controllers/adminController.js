@@ -6,17 +6,6 @@ export class AdminController {
     this.adminController = adminController;
   }
 
-  allUsers = async (req, res) => {
-    try {
-      const response = await this.adminController.allUsers();
-      res.status(HttpStatus.OK).json(response);
-    } catch (error) {
-      res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
-    }
-  };
-
   changeRoles = async (req, res) => {
     try {
       const data = {
@@ -99,6 +88,34 @@ export class AdminController {
       res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ error: error.message });
+    }
+  };
+
+  createAdmin = async (req, res) => {
+    try {
+      const data = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        dateOfBirth: req.body.dateOfBirth,
+      };
+      const response = await this.adminController.createAdmin(data);
+      res.status(HttpStatus.CREATED).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  };
+
+  allUsers = async (req, res) => {
+    try {
+      const response = await this.adminController.allUsers();
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
     }
   };
 }

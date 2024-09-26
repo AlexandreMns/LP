@@ -14,21 +14,21 @@ const roleHierarchy = {
 
 const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    dateOfBirth: { type: Date, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    name: { type: String, required: true }, //User
+    dateOfBirth: { type: Date, required: true }, //User
+    email: { type: String, required: true, unique: true }, //User
+    password: { type: String, required: true }, //User
     role: {
       type: String,
       enum: Object.values(roles),
       required: true,
       default: roles.CLIENT,
-    },
-    resetPasswordToken: { type: String },
-    phone: { type: String },
-    agentLicense: { type: String },
+    }, //User
+    resetPasswordToken: { type: String }, //User
+    phone: { type: String }, //User ?
+    agentLicense: { type: String }, //Agent
     employer: { type: String },
-    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
+    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], //Agent
   },
   { discriminatorKey: "role" }
 );

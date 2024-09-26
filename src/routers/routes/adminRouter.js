@@ -9,19 +9,9 @@ const router = Router();
 const adminService = new AdminService();
 const adminController = new AdminController(adminService);
 
-// ==========================MODERATOR & ADMIN ROUTES==========================
-
-//Get all users
-router.get(
-  "/all",
-  verifyToken,
-  authorize(roles.AGENT),
-  adminController.allUsers
-);
-
 // ==========================ADMIN ROUTES==========================
 
-//Change user role ? Fazer com parametro ??
+//Change user role ? Fazer com parametro id ??
 router.put(
   "/change-role",
   verifyToken,
@@ -59,6 +49,22 @@ router.get(
   verifyToken,
   authorize(roles.ADMIN),
   adminController.getUser
+);
+
+//Create a new Admin
+router.post(
+  "/create-admin",
+  verifyToken,
+  authorize(roles.ADMIN),
+  adminController.createAdmin
+);
+
+//Get all users
+router.get(
+  "/all-users",
+  verifyToken,
+  authorize(roles.ADMIN),
+  adminController.allUsers
 );
 
 export default router;
