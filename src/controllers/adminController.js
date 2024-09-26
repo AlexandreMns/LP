@@ -1,3 +1,4 @@
+import { isValid } from "../utils/dataUtil.js";
 import { HttpStatus } from "../utils/httpStatus.js";
 
 export class AdminController {
@@ -22,6 +23,10 @@ export class AdminController {
         userId: req.body.userId,
         newRole: req.body.newRole,
       };
+      const validation = isValid(data.userId);
+      if (!validation) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ error: "Invalid ID" });
+      }
       const response = await this.adminController.changeRoles(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
@@ -31,45 +36,71 @@ export class AdminController {
     }
   };
 
-  async getDashboard(req, res) {
+  getDashboard = async (req, res) => {
     try {
-      const dashboardData = await this.adminService.getDashboardData();
+      const dashboardData = await this.adminController.getDashboardData();
       res.status(200).json(dashboardData);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  };
 
-  async createUser(req, res) {
+  createUser = async (req, res) => {
     try {
       const userData = req.body;
-      const newUser = await this.adminService.createUser(userData);
+      const newUser = await this.adminController.createUser(userData);
       res.status(201).json(newUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  };
 
-  async deleteUser(req, res) {
+  deleteUser = async (req, res) => {
     try {
       const userId = req.params.userId;
-      await this.adminService.deleteUser(userId);
-      res.status(204).send();
+      const response = await this.adminController.deleteUser(userId);
+      res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  };
 
-  async updateUser(req, res) {
+  updateUser = async (req, res) => {
     try {
-      const userId = req.params.userId;
-      const userData = req.body;
-      const updatedUser = await this.adminService.updateUser(userId, userData);
-      res.status(200).json(updatedUser);
+      const data = {
+        userId: req.params.userId,
+        userData: req.body,
+      };
+      const response = isValid(data.userId);
+      if (!response) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ error: "Invalid ID" });
+      }
+      const updatedUser = await this.adminController.updateUser(data);
+      res.status(HttpStatus.OK).json(updatedUser);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
     }
-  }
+  };
+
+  getUser = async (req, res) => {
+    try {
+      const data = {
+        userId: req.params.userId,
+      };
+      const validation = isValid(data.userId);
+      if (!validation) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ error: "Invalid ID" });
+      }
+      const user = await this.adminController.getUser(data);
+      res.status(HttpStatus.OK).json(user);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  };
 }
 
 export default AdminController;

@@ -1,4 +1,5 @@
 import { User } from "../../models/usersModel.js";
+import { dataRole } from "../../utils/dataUtil.js";
 
 export class AdminService {
   async allUsers() {
@@ -45,6 +46,7 @@ export class AdminService {
 
   async getDashboardData() {
     // Exemplo de lógica para obter dados do dashboard
+    //Mudar muita coisa aqui
     const totalUsers = await User.countDocuments();
     const totalImoveis = await Imovel.countDocuments();
     const totalClientes = await User.countDocuments({ role: "client" });
@@ -61,16 +63,35 @@ export class AdminService {
   }
 
   async createUser(userData) {
+    //Mudar muita coisa aqui
     const newUser = new User(userData);
     await newUser.save();
     return newUser;
   }
 
   async deleteUser(userId) {
-    const result = await User.deleteOne({ _id: userId });
-    if (result.deletedCount === 0) {
-      throw new Error("User not found");
+    try {
+      const result = await User.deleteOne({ _id: userId });
+      if (result.deletedCount === 0) {
+        throw new Error("User not found");
+      }
+      return "User deleted successfully";
+    } catch (error) {
+      throw new Error("Problem in deleting user " + error);
     }
-    return { message: "User deleted successfully" };
+  }
+
+  async getUser(data) {
+    try {
+      const userId = data.userId;
+      const user = await User.findById(userId);
+      if (!user) {
+        return "User not found";
+      }
+      const payload = dataRole(userId);
+      return payload;
+    } catch (error) {
+      throw new Error("Problem in fetching user info " + error);
+    }
   }
 }
