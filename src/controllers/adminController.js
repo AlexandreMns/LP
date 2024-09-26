@@ -1,14 +1,14 @@
 import { HttpStatus } from "../utils/httpStatus.js";
 
 export class AdminController {
-  constructor(adminController) {
-    this.adminController = adminController;
+  constructor(adminService) {
+    this.adminService = adminService;
   }
 
   allUsers = async (req, res) => {
     console.log("All users");
     try {
-      const response = await this.adminController.allUsers(req.user);
+      const response = await this.adminService.allUsers();
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res
@@ -23,7 +23,7 @@ export class AdminController {
         userId: req.body.userId,
         newRole: req.body.newRole,
       };
-      const response = await this.adminController.changeRoles(data);
+      const response = await this.adminService.changeRoles(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res
@@ -31,7 +31,6 @@ export class AdminController {
         .json({ message: error.message });
     }
   };
-
 
   async getDashboard(req, res) {
     try {
@@ -73,3 +72,5 @@ export class AdminController {
     }
   }
 }
+
+export default AdminController;

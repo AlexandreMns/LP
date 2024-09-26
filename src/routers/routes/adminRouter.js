@@ -15,7 +15,7 @@ const adminController = new AdminController(adminService);
 router.get(
   "/all",
   verifyToken,
-  authorize(roles.MODERATOR),
+  authorize(roles.AGENT),
   adminController.allUsers
 );
 

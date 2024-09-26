@@ -1,15 +1,20 @@
 import { User } from "../../models/usersModel.js";
 
 export class AdminService {
-  async allUsers(data) {
+  async allUsers() {
     try {
       const users = await User.find();
       const payload = users.map((user) => {
         return {
           id: user._id,
           name: user.name,
+          dateOfBirth: user.dateOfBirth,
           email: user.email,
           role: user.role,
+          phone: user.phone,
+          agentLicense: user.agentLicense,
+          employer: user.employer,
+          properties: user.properties,
         };
       });
       return payload;
