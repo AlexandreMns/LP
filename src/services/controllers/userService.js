@@ -88,12 +88,14 @@ export class UserService {
     try {
       const userId = data.userId;
       const user = await User.findById(userId);
+      console.log(user);
 
       if (user.resetPasswordToken === undefined) {
         return "No token found";
       }
-
+      console.log("hello");
       const verifycation = await tokenPasswordReset(user.resetPasswordToken);
+      console.log("hello");
       if (!verifycation) {
         return "Token expired";
       }
