@@ -24,4 +24,11 @@ router.get("/forgot-password-token", userController.forgotPasswordToken);
 //Forgot password
 router.post("/forgot-password", verifyToken, userController.forgotPassword);
 
+//Get all propertys
+router.get(
+  "/all-properties/:params",
+  verifyToken,
+  userController.allProperties
+);
+
 export default router;
