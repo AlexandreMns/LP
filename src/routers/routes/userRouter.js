@@ -19,7 +19,11 @@ router.post("/login", userController.login);
 router.get("/me", verifyToken, userController.me);
 
 //Forgot password token
-router.get("/forgot-password-token", userController.forgotPasswordToken);
+router.get(
+  "/forgot-password-token",
+  verifyToken,
+  userController.forgotPasswordToken
+);
 
 //Forgot password
 router.post("/forgot-password", verifyToken, userController.forgotPassword);

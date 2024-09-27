@@ -48,60 +48,11 @@ export class AdminService {
   }
 
   async deleteUser(userId) {
-    try {
-      const result = await User.deleteOne({ _id: userId });
-      if (result.deletedCount === 0) {
-        throw new Error("User not found");
-      }
-      return "User deleted successfully";
-    } catch (error) {
-      throw new Error("Problem in deleting user " + error);
+    const result = await User.deleteOne({ _id: userId });
+    if (result.deletedCount === 0) {
+      throw new Error('User not found');
     }
+    return { message: 'User deleted successfully' };
   }
 
-  async getUser(data) {
-    try {
-      const userId = data.userId;
-      const user = await User.findById(userId);
-      if (!user) {
-        return "User not found";
-      }
-      const payload = dataRole(userId);
-      return payload;
-    } catch (error) {
-      throw new Error("Problem in fetching user info " + error);
-    }
-  }
-
-  async createAdmin(data) {
-    try {
-      const user = await User.findOne({ email: data.email });
-      if (user) {
-        return "User already exists"; // mesmo com este erro da 201 corrigir para 409
-      }
-      const roleAdd = {
-        role: roles.ADMIN,
-      };
-      const newData = Object.assign(data, roleAdd);
-      const newAdmin = new User(newData);
-      await newAdmin.save();
-      return newAdmin;
-    } catch (error) {
-      throw new Error("Problem in creating admin " + error);
-    }
-  }
-
-  async allUsers() {
-    try {
-      const users = await User.find();
-      const payload = [];
-      for (let i = 0; i < users.length; i++) {
-        let payloadData = await dataRole(users[i]._id);
-        payload.push(payloadData);
-      }
-      return payload;
-    } catch (error) {
-      throw new Error("Problem in fetching users " + error);
-    }
-  }
 }
