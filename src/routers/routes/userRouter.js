@@ -18,7 +18,6 @@ router.post("/login", userController.login);
 //Forgot password token
 router.get(
   "/forgot-password-token",
-  verifyToken,
   userController.forgotPasswordToken
 );
 
