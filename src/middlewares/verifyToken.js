@@ -33,7 +33,7 @@ function verifyToken(req, res, next) {
     .catch(() => {
       res
         .status(HttpStatus.UNAUTHORIZED)
-        .send({ auth: false, message: "Failed to authenticate token" });
+        .send({ auth: false, message: "Expired token or invalid token" });
     });
 }
 

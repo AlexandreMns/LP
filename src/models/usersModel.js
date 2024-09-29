@@ -27,7 +27,7 @@ const UserSchema = new mongoose.Schema(
     resetPasswordToken: { type: String }, //User
     phone: { type: String }, //User ?
     agentLicense: { type: String }, //Agent
-    employer: { type: String },
+    employer: { type: String }, //Agent
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], //Agent
   },
   { discriminatorKey: "role" }
