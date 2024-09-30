@@ -53,11 +53,11 @@ export class AdminService {
     try {
       const result = await User.deleteOne({ _id: userId });
       if (result.deletedCount === 0) {
-        throw new Error("User not found");
+        throw new Error('User not found');
       }
-      return "User deleted successfully";
+      return "User deleted successfully"
     } catch (error) {
-      throw new Error("Problem in deleting user " + error);
+      throw new Error ('Problem in deleting user ' + error);
     }
   }
 
