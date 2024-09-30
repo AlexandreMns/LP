@@ -90,4 +90,39 @@ export class UserController {
         .json({ message: error.message });
     }
   };
+  async addToWishlist(req, res) {
+    try {
+      const userId = req.user; // vê se o id do usuário está disponível no token
+      const itemId = req.params.itemId;
+      const note = req.body.note || ""; // Nota opcional
+      const wishlist = await this.userServices.addToWishlist(userId, itemId, note);
+      console.log(wishlist);
+      res.status(200).json(wishlist);
+    
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async removeFromWishlist(req, res) {
+    try {
+      const userId = req.user; // vê se o id do usuário está disponível no token
+      const itemId = req.params.itemId;
+      const wishlist = await this.userServices.removeFromWishlist(userId, itemId);
+      res.status(200).json(wishlist);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async viewWishlist(req, res) {
+    try {
+      const userId = req.user; // vê se o id do usuário está disponível no token
+      const wishlist = await this.userServices.viewWishlist(userId);
+      res.status(200).json(wishlist);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
 }
