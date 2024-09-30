@@ -11,12 +11,11 @@ const agentController = new AgentController(agentService);
 
 // ==========================AGENT ROUTES==========================
 
-//Create a new Property
-router.post(
-  "/add-property",
+router.get(
+  "/own-properties",
   verifyToken,
   authorize(roles.AGENT),
-  agentController.addProperty
+  agentController.getProperties
 );
 
 export default router;

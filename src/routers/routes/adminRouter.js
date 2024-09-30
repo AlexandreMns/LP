@@ -19,7 +19,7 @@ router.put(
   adminController.changeRoles
 );
 
-// Get dashboard data - Não funcional
+// Get dashboard data
 router.get(
   "/dashboard",
   verifyToken,

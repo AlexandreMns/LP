@@ -1,5 +1,7 @@
 import { roles, User } from "../../models/usersModel.js";
+import { Property } from "../../models/propertyModel.js";
 import { dataRole } from "../../utils/dataUtil.js";
+import { createPassword } from "../../utils/passwordUtil.js";
 
 export class AdminService {
   async changeRoles(data) {
@@ -26,14 +28,14 @@ export class AdminService {
     // Exemplo de lógica para obter dados do dashboard
     //Mudar muita coisa aqui
     const totalUsers = await User.countDocuments();
-    const totalImoveis = await Imovel.countDocuments();
+    const totalProperties = await Property.countDocuments();
     const totalClientes = await User.countDocuments({ role: "client" });
     const totalAgentes = await User.countDocuments({ role: "agent" });
     const totalAdmins = await User.countDocuments({ role: "admin" });
 
     return {
       totalUsers,
-      totalImoveis,
+      totalProperties,
       totalClientes,
       totalAgentes,
       totalAdmins,
@@ -75,6 +77,9 @@ export class AdminService {
 
   async createAdmin(data) {
     try {
+      const password = data.password;
+      const hashPassword = await createPassword(password);
+      data.password = hashPassword;
       const user = await User.findOne({ email: data.email });
       if (user) {
         return "User already exists"; // mesmo com este erro da 201 corrigir para 409
@@ -85,21 +90,43 @@ export class AdminService {
       const newData = Object.assign(data, roleAdd);
       const newAdmin = new User(newData);
       await newAdmin.save();
-      return newAdmin;
+      return dataRole(newAdmin);
     } catch (error) {
       throw new Error("Problem in creating admin " + error);
     }
   }
 
-  async allUsers() {
+  async allUsers(data) {
     try {
-      const users = await User.find();
-      const payload = [];
-      for (let i = 0; i < users.length; i++) {
-        let payloadData = await dataRole(users[i]._id);
-        payload.push(payloadData);
+      const skip = (data.page - 1) * data.limit;
+
+      const filter = {};
+
+      if (data.role) {
+        filter.role = data.role; // Filtrar por papel se fornecido
       }
-      return payload;
+      if (data.search) {
+        filter.$or = [
+          { name: { $regex: data.search, $options: "i" } },
+          { email: { $regex: data.search, $options: "i" } },
+        ];
+      }
+
+      const users = await User.find(filter)
+        .skip(skip)
+        .limit(Number(data.limit)); // Aplicar paginação
+      const total = await User.countDocuments(filter); // Total de usuários filtrados
+
+      const payload = await Promise.all(
+        users.map((user) => dataRole(user._id)) // Buscar dados do papel para cada usuário
+      );
+      return {
+        data: payload,
+        total,
+        page: Number(data.page),
+        limit: Number(data.limit),
+        pages: Math.ceil(total / data.limit),
+      };
     } catch (error) {
       throw new Error("Problem in fetching users " + error);
     }

@@ -67,7 +67,9 @@ export const createProperty = async (data) => {
       delete data.bedrooms;
       delete data.bathrooms;
     }
-    const property = new Property(data);
+
+    data.agent = data.agent;
+    const property = new Property({ ...data, agent: data.agent });
     await property.save();
     return property;
   } catch (error) {

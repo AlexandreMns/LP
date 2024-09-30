@@ -15,20 +15,18 @@ router.post("/register", userController.register);
 //Login user
 router.post("/login", userController.login);
 
-//Get user information
-router.get("/me", verifyToken, userController.me);
-
 //Forgot password token
 router.get("/forgot-password-token", userController.forgotPasswordToken);
 
 //Forgot password
-router.post("/forgot-password", verifyToken, userController.forgotPassword);
+router.post("/forgot-password", verifyToken, userController.forgotPassword); //???
 
-//Get all propertys
-router.get(
-  "/all-properties/:params",
-  verifyToken,
-  userController.allProperties
-);
+// ==========================PRIVATE ROUTES==========================
+
+//Get user information
+router.get("/me", verifyToken, userController.me);
+
+//Get user by id
+router.get("/:id", verifyToken, userController.userById);
 
 export default router;
