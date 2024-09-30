@@ -16,7 +16,6 @@ const authorize = (requiredRole) => {
       // Decode the token
       const decoded = await decodeToken(token);
       const userRole = decoded.role;
-      
 
       if (!userRole) {
         return res

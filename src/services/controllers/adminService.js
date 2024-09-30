@@ -1,4 +1,5 @@
 import { roles, User } from "../../models/usersModel.js";
+import { Property } from "../../models/propertyModel.js";
 import { dataRole } from "../../utils/dataUtil.js";
 
 export class AdminService {
@@ -26,14 +27,14 @@ export class AdminService {
     // Exemplo de lógica para obter dados do dashboard
     //Mudar muita coisa aqui
     const totalUsers = await User.countDocuments();
-    const totalImoveis = await Imovel.countDocuments();
+    const totalProperties = await Property.countDocuments();
     const totalClientes = await User.countDocuments({ role: "client" });
     const totalAgentes = await User.countDocuments({ role: "agent" });
     const totalAdmins = await User.countDocuments({ role: "admin" });
 
     return {
       totalUsers,
-      totalImoveis,
+      totalProperties,
       totalClientes,
       totalAgentes,
       totalAdmins,
