@@ -92,15 +92,37 @@ export class AdminService {
     }
   }
 
-  async allUsers() {
+  async allUsers(data) {
     try {
-      const users = await User.find();
-      const payload = [];
-      for (let i = 0; i < users.length; i++) {
-        let payloadData = await dataRole(users[i]._id);
-        payload.push(payloadData);
+      const skip = (data.page - 1) * data.limit;
+
+      const filter = {};
+
+      if (data.role) {
+        filter.role = data.role; // Filtrar por papel se fornecido
       }
-      return payload;
+      if (data.search) {
+        filter.$or = [
+          { name: { $regex: data.search, $options: "i" } },
+          { email: { $regex: data.search, $options: "i" } },
+        ];
+      }
+
+      const users = await User.find(filter)
+        .skip(skip)
+        .limit(Number(data.limit)); // Aplicar paginação
+      const total = await User.countDocuments(filter); // Total de usuários filtrados
+
+      const payload = await Promise.all(
+        users.map((user) => dataRole(user._id)) // Buscar dados do papel para cada usuário
+      );
+      return {
+        data: payload,
+        total,
+        page: Number(data.page),
+        limit: Number(data.limit),
+        pages: Math.ceil(total / data.limit),
+      };
     } catch (error) {
       throw new Error("Problem in fetching users " + error);
     }

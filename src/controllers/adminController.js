@@ -110,7 +110,13 @@ export class AdminController {
 
   allUsers = async (req, res) => {
     try {
-      const response = await this.adminController.allUsers();
+      const data = {
+        page: req.query.page || 1,
+        limit: req.query.limit || 10,
+        role: req.query.role,
+        search: req.query.search,
+      };
+      const response = await this.adminController.allUsers(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res

@@ -31,7 +31,6 @@ export class UserService {
       const token = createToken(user);
       const userToken = {
         token: token.token,
-        role: user.role,
       };
       return userToken;
     } catch (error) {
@@ -57,7 +56,6 @@ export class UserService {
       const token = createToken(user, config.expiresIn);
       const userToken = {
         token: token.token,
-        role: user.role,
       };
       return userToken;
     } catch (error) {
@@ -140,10 +138,6 @@ export class UserService {
       throw new Error("Problem in forgot password token " + error);
     }
   }
-
-  //
-  //
-  //
 
   async allProperties(data) {
     try {
