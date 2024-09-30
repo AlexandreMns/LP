@@ -24,7 +24,11 @@ const PropertySchema = new mongoose.Schema({
     },
   }, // House or Apartment
   doorNumber: { type: String, required: true },
-  agente: { type: mongoose.Schema.Types.ObjectId, ref: "Agente" },
+  agent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   parish: { type: String, required: true },
   city: { type: String, required: true },
   price: { type: Number, required: true },

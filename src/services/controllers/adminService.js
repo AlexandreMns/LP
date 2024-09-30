@@ -1,6 +1,7 @@
 import { roles, User } from "../../models/usersModel.js";
 import { Property } from "../../models/propertyModel.js";
 import { dataRole } from "../../utils/dataUtil.js";
+import { createPassword } from "../../utils/passwordUtil.js";
 
 export class AdminService {
   async changeRoles(data) {
@@ -76,6 +77,9 @@ export class AdminService {
 
   async createAdmin(data) {
     try {
+      const password = data.password;
+      const hashPassword = await createPassword(password);
+      data.password = hashPassword;
       const user = await User.findOne({ email: data.email });
       if (user) {
         return "User already exists"; // mesmo com este erro da 201 corrigir para 409
@@ -86,7 +90,7 @@ export class AdminService {
       const newData = Object.assign(data, roleAdd);
       const newAdmin = new User(newData);
       await newAdmin.save();
-      return newAdmin;
+      return dataRole(newAdmin);
     } catch (error) {
       throw new Error("Problem in creating admin " + error);
     }

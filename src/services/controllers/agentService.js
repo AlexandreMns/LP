@@ -6,13 +6,4 @@ export class AgentService {
     const properties = await Property.find({ agent: agentId });
     return properties;
   }
-
-  async addProperty(data) {
-    try {
-      const property = await createProperty(data);
-      return property;
-    } catch (error) {
-      throw new Error("Problem in the addProperty " + error);
-    }
-  }
 }
