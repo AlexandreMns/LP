@@ -14,7 +14,7 @@ const roleHierarchy = {
 
 const WishListItemSchema = new mongoose.Schema({
   property: { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
-  note: { type: String, default: "" }
+  note: { type: String, default: "" },
 });
 
 const UserSchema = new mongoose.Schema(
@@ -33,7 +33,6 @@ const UserSchema = new mongoose.Schema(
     phone: { type: String }, //User ?
     agentLicense: { type: String }, //Agent
     employer: { type: String },
-    properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], //Agent
     wishList: { type: [WishListItemSchema], default: [] }, //Client
   },
   { discriminatorKey: "role" }
