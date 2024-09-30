@@ -12,6 +12,11 @@ const roleHierarchy = {
   [roles.ADMIN]: 3,
 };
 
+const WishListItemSchema = new mongoose.Schema({
+  property: { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
+  note: { type: String, default: "" }
+});
+
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: true }, //User
@@ -29,7 +34,7 @@ const UserSchema = new mongoose.Schema(
     agentLicense: { type: String }, //Agent
     employer: { type: String },
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], //Agent
-    wishList: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], default: [] }, //Client
+    wishList: { type: [WishListItemSchema], default: [] }, //Client
   },
   { discriminatorKey: "role" }
 );
