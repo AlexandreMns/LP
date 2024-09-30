@@ -105,6 +105,7 @@ export class UserController {
     try {
       const userId = req.user; // vê o ID do usuário no token
       const itemId = req.params.itemId;
+      
       const wishlist = await this.userServices.addToWishlist(userId, itemId);
       res.status(200).json(wishlist);
     } catch (error) {
