@@ -206,7 +206,7 @@ export class UserService {
     }
   }
 
-  async addToWishlist(userId, itemId, note) {
+  async addToWishlist(userId, itemId) {
     try {
       const user = await User.findById(userId);
       if (!user) {
@@ -216,11 +216,8 @@ export class UserService {
         user.wishList = []; // Inicializa a wishList se estiver indefinida
       }
       // Verifica se o item já está na wishlist
-      const existingItem = user.wishList.find(item => item.property && item.property.toString() === itemId);
-      if (existingItem) {
-        existingItem.note = note; // Atualiza a nota se o item já existir
-      } else {
-        user.wishList.push({ property: itemId, note });
+      if (!user.wishList.includes(itemId)) {
+        user.wishList.push(itemId);
       }
       await user.save();
       return user.wishList;
@@ -239,7 +236,7 @@ export class UserService {
       if (!user.wishList) {
         user.wishList = []; // Inicializa a wishList se estiver indefinida
       }
-      user.wishList = user.wishList.filter(item => item.property && item.property.toString() !== itemId);
+      user.wishList = user.wishList.filter(id => id.toString() !== itemId);
       await user.save();
       return user.wishList;
     } catch (error) {
@@ -247,10 +244,9 @@ export class UserService {
     }
   }
 
-  // Método para visualizar a wishlist
   async viewWishlist(userId) {
     try {
-      const user = await User.findById(userId).populate('wishList.property');
+      const user = await User.findById(userId).populate('wishList');
       if (!user) {
         throw new Error('User not found');
       }
@@ -259,4 +255,7 @@ export class UserService {
       throw new Error('Problem in viewing wishlist ' + error);
     }
   }
+
+
+
 }
