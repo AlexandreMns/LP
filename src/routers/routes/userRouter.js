@@ -34,4 +34,15 @@ router.get(
   userController.allProperties
 );
 
+// Adicionar item à wishlist
+router.post('/wishlist/:itemId', verifyToken, userController.addToWishlist.bind(userController));
+
+// Remover item da wishlist
+router.delete('/wishlist/:itemId', verifyToken, userController.removeFromWishlist.bind(userController));
+
+// Listar wishlist
+router.get('/wishlist', verifyToken, userController.viewWishlist.bind(userController));
+
+
+
 export default router;

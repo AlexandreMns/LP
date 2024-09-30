@@ -29,6 +29,7 @@ const UserSchema = new mongoose.Schema(
     agentLicense: { type: String }, //Agent
     employer: { type: String },
     properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], //Agent
+    wishList: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }], default: [] }, //Client
   },
   { discriminatorKey: "role" }
 );

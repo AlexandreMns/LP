@@ -228,4 +228,57 @@ export class UserService {
       throw new Error("Problem in fetching properties " + error);
     }
   }
+
+  async addToWishlist(userId, itemId) {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      if (!user.wishList) {
+        user.wishList = []; // Inicializa a wishList se estiver indefinida
+      }
+      // Verifica se o item já está na wishlist
+      if (!user.wishList.includes(itemId)) {
+        user.wishList.push(itemId);
+      }
+      await user.save();
+      return user.wishList;
+    } catch (error) {
+      throw new Error('Problem in adding item to wishlist ' + error);
+    }
+  }
+
+  // Método para remover item da wishlist
+  async removeFromWishlist(userId, itemId) {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      if (!user.wishList) {
+        user.wishList = []; // Inicializa a wishList se estiver indefinida
+      }
+      user.wishList = user.wishList.filter(id => id.toString() !== itemId);
+      await user.save();
+      return user.wishList;
+    } catch (error) {
+      throw new Error('Problem in removing item from wishlist ' + error);
+    }
+  }
+
+  async viewWishlist(userId) {
+    try {
+      const user = await User.findById(userId).populate('wishList');
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user.wishList;
+    } catch (error) {
+      throw new Error('Problem in viewing wishlist ' + error);
+    }
+  }
+
+
+
 }
