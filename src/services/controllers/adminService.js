@@ -131,4 +131,16 @@ export class AdminService {
       throw new Error("Problem in fetching users " + error);
     }
   }
+
+  async getUserById(data) {
+    try{
+      const user = await User.findById(data);
+      if(!user){
+        return "User not found";
+      }
+      return user;
+    }catch(error){
+      throw new Error("Problem in fetching user by id " + error);
+    }
+  }
 }

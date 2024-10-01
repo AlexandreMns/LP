@@ -94,4 +94,17 @@ export class AdminController {
         .json({ message: error.message });
     }
   };
+
+  getUserById = async (req, res) => {
+    try {
+      const data = req.params.userId;
+      const response = await this.adminController.getUserById(data);
+      res.status(HttpStatus.OK).json(response);
+
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
 }
