@@ -9,6 +9,8 @@ export class PropertyController {
     try {
       const data = {
         type: req.body.type,
+        floors: req.body.floors,
+        garageSize: req.body.garageSize,
         agent: req.user,
         street: req.body.street,
         bathrooms: req.body.bathrooms,

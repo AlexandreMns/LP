@@ -29,25 +29,4 @@ router.get("/me", verifyToken, userController.me);
 //Get user by id
 router.get("/:id", verifyToken, userController.userById);
 
-// Adicionar item à wishlist
-router.post(
-  "/wishlist/:itemId",
-  verifyToken,
-  userController.addToWishlist.bind(userController)
-);
-
-// Remover item da wishlist
-router.delete(
-  "/wishlist/:itemId",
-  verifyToken,
-  userController.removeFromWishlist.bind(userController)
-);
-
-// Listar wishlist
-router.get(
-  "/wishlist",
-  verifyToken,
-  userController.viewWishlist.bind(userController)
-);
-
 export default router;

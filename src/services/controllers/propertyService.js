@@ -30,6 +30,16 @@ export class PropertyService {
         query.bathrooms = parseInt(data.bathrooms);
       }
 
+      // Filtra por número de pisos
+      if (data.floors) {
+        query.floors = parseInt(data.floors);
+      }
+
+      // Filtra por tamanho da garagem
+      if (data.garageSize) {
+        query.garageSize = parseInt(data.garageSize);
+      }
+
       // Filtro de preço
       if (data.minPrice || data.maxPrice) {
         query.price = {};
