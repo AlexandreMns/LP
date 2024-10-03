@@ -75,7 +75,6 @@ export class UserService {
     try {
       const userId = data;
       const user = await User.findById(userId);
-      // Questionable if
       if (!user) {
         return "User not found";
       }
@@ -85,9 +84,7 @@ export class UserService {
       throw new Error("Problem in fetching user " + error);
     }
   }
-  //
-  //Forgot password needs to be fixed, it needs to work via a token send in the email
-  //
+
   async forgotPassword(data) {
     try {
       const userId = data.userId;
@@ -136,12 +133,10 @@ export class UserService {
       }
       user.resetPasswordToken = createTokenPasswordReset(user);
       await user.save();
-      //Temporario
       const token = {
         token: user.resetPasswordToken,
       };
       return token;
-      // return "Token sent to email";
     } catch (error) {
       throw new Error("Problem in forgot password token " + error);
     }
