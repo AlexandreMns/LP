@@ -11,7 +11,6 @@ export class WishlistController {
         note: req.body.note || "",
       };
       const wishlist = await this.wishlistService.addToWishlist(data);
-      console.log(wishlist);
       res.status(200).json(wishlist);
     } catch (error) {
       res.status(500).json({ error: error.message });
