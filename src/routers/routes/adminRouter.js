@@ -49,4 +49,7 @@ router.post(
 // Delete a user
 router.delete('/delete-user/:userId', verifyToken, authorize(roles.ADMIN), adminController.deleteUser);
 
+//Get user by Id
+router.get('/user/:userId', verifyToken, authorize(roles.ADMIN), adminController.getUserById);
+
 export default router;

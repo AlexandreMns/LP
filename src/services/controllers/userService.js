@@ -1,5 +1,6 @@
 import { User, roles } from "../../models/usersModel.js";
 import { tokenPasswordReset } from "../../middlewares/verifyToken.js";
+import { Wishlist } from "../../models/wishlistModel.js";
 import {
   createToken,
   createTokenPasswordReset,
@@ -19,14 +20,22 @@ export class UserService {
         return "User already exists";
       }
 
+      const wishlist = new Wishlist({
+        items: [],
+        total: 0,
+      });
+
       const user = new User({
         name: data.name,
         email: data.email,
-        dateOfBirth: data.dateOfBirth,
         password: hashPassword,
         role: roles.USER,
+        wishlist: wishlist,
       });
+
       await user.save();
+      await wishlist.save();
+
       const token = createToken(user);
       const userToken = {
         token: token.token,
@@ -144,57 +153,6 @@ export class UserService {
       return payload;
     } catch (error) {
       throw new Error("Problem in fetching user " + error);
-    }
-  }
-
-  async addToWishlist(userId, itemId, note) {
-    try {
-      const user = await User.findById(userId);
-      if (!user) {
-        throw new Error('User not found');
-      }
-      if (!user.wishList) {
-        user.wishList = []; // Inicializa a wishList se estiver indefinida
-      }
-      const existingItem = user.wishList.find(item => item.property && item.property.toString() === itemId);
-      if (existingItem) {
-        existingItem.note = note; // Atualiza a nota se o item já existir
-      } else {
-        user.wishList.push({ property: itemId, note });
-      }
-      await user.save();
-      return user.wishList;
-    } catch (error) {
-      throw new Error('Problem in adding item to wishlist ' + error);
-    }
-  }
-
-  async removeFromWishlist(userId, itemId) {
-    try {
-      const user = await User.findById(userId);
-      if (!user) {
-        throw new Error('User not found');
-      }
-      if (!user.wishList) {
-        user.wishList = []; // Inicializa a wishList se estiver indefinida
-      }
-      user.wishList = user.wishList.filter(item => item.property && item.property.toString() !== itemId);
-      await user.save();
-      return user.wishList;
-    } catch (error) {
-      throw new Error('Problem in removing item from wishlist ' + error);
-    }
-  }
-
-  async viewWishlist(userId) {
-    try {
-      const user = await User.findById(userId).populate('wishList.property');
-      if (!user) {
-        throw new Error('User not found');
-      }
-      return user.wishList;
-    } catch (error) {
-      throw new Error('Problem in viewing wishlist ' + error);
     }
   }
 }

@@ -23,6 +23,18 @@ const PropertySchema = new mongoose.Schema({
       return this.type === type.HOUSE || this.type === type.APARTMENT;
     },
   }, // House or Apartment
+  floors: {
+    type: Number,
+    required: function () {
+      return this.type === type.HOUSE || this.type === type.APARTMENT;
+    },
+  }, // House
+  garageSize: {
+    type: Number,
+    required: function () {
+      return this.type === type.HOUSE || this.type === type.APARTMENT;
+    },
+  }, // House
   doorNumber: { type: String, required: true },
   agent: {
     type: mongoose.Schema.Types.ObjectId,
