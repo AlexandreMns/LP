@@ -1,5 +1,6 @@
 import { User, roles } from "../../models/usersModel.js";
 import { tokenPasswordReset } from "../../middlewares/verifyToken.js";
+import { Wishlist } from "../../models/wishlistModel.js";
 import {
   createToken,
   createTokenPasswordReset,
@@ -19,14 +20,22 @@ export class UserService {
         return "User already exists";
       }
 
+      const wishlist = new Wishlist({
+        items: [],
+        total: 0,
+      });
+
       const user = new User({
         name: data.name,
         email: data.email,
-        dateOfBirth: data.dateOfBirth,
         password: hashPassword,
         role: roles.USER,
+        wishlist: wishlist,
       });
+
       await user.save();
+      await wishlist.save();
+
       const token = createToken(user);
       const userToken = {
         token: token.token,

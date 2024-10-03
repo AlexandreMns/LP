@@ -12,15 +12,6 @@ const roleHierarchy = {
   [roles.ADMIN]: 3,
 };
 
-const WishlistSchema = new mongoose.Schema({
-  properties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Properties" }],
-});
-
-const WishListItemSchema = new mongoose.Schema({
-  property: { type: mongoose.Schema.Types.ObjectId, ref: "Property" },
-  note: { type: String, default: "" },
-});
-
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true }, //User
   email: { type: String, required: true, unique: true }, //User
@@ -35,14 +26,9 @@ const UserSchema = new mongoose.Schema({
   phone: { type: String }, //User ?
   agentLicense: { type: String }, //Agent
   employer: { type: String },
-  wishList: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Wishlist",
-    required: true,
-  }, //Client
+  wishlist: { type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" },
 });
 
 const User = mongoose.model("User", UserSchema);
-const Wishlist = mongoose.model("Wishlist", WishlistSchema);
 
-export { User, roles, roleHierarchy, Wishlist };
+export { User, roles, roleHierarchy };

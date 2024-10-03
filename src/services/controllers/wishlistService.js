@@ -1,21 +1,26 @@
 import { User } from "../../models/usersModel.js";
+import { Wishlist } from "../../models/wishlistModel.js";
 
 export class WishlistService {
   // Método para remover item da wishlist
-  async removeFromWishlist(userId, itemId) {
+  async removeFromWishlist(data) {
     try {
-      const user = await User.findById(userId);
+      const user = await User.findById(data.userId);
       if (!user) {
         throw new Error("User not found");
       }
-      if (!user.wishList) {
-        user.wishList = []; // Inicializa a wishList se estiver indefinida
+
+      const wishlist = await Wishlist.findById(user.wishlist);
+      if (!wishlist) {
+        throw new Error("Wishlist not found");
       }
-      user.wishList = user.wishList.filter(
-        (item) => item.property && item.property.toString() !== itemId
+
+      // Remove item from wishlist
+      wishlist.items = wishlist.items.filter(
+        (item) => item.property.toString() !== data.itemId
       );
-      await user.save();
-      return user.wishList;
+      await wishlist.save();
+      return wishlist;
     } catch (error) {
       throw new Error("Problem in removing item from wishlist " + error);
     }
@@ -24,41 +29,47 @@ export class WishlistService {
   // Método para visualizar a wishlist
   async viewWishlist(data) {
     try {
-      console.log(data);
-      const user = await User.findById(data);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      const wishlist = user.wishList;
-      if (!wishlist) {
-        return [];
-      }
-      return wishlist;
-    } catch (error) {
-      throw new Error("Problem in viewing wishlist " + error);
-    }
-  }
-
-  async addToWishlist(userId, itemId, note) {
-    try {
+      const userId = data;
       const user = await User.findById(userId);
       if (!user) {
         throw new Error("User not found");
       }
-      if (!user.wishList) {
-        user.wishList = []; // Inicializa a wishList se estiver indefinida
+      const wishList = await Wishlist.findById(user.wishlist);
+      return wishList;
+    } catch (error) {
+      throw new Error("Problem in fetching user" + error);
+    }
+  }
+
+  async addToWishlist(data) {
+    try {
+      const user = await User.findById(data.userId);
+      if (!user) {
+        throw new Error("User not found");
       }
-      // Verifica se o item já está na wishlist
-      const existingItem = user.wishList.find(
-        (item) => item.property && item.property.toString() === itemId
+
+      const wishlist = await Wishlist.findById(user.wishlist);
+      if (!wishlist) {
+        throw new Error("Wishlist not found");
+      }
+
+      // Verify if the item is already in the wishlist
+      const isItemAlreadyInWishlist = wishlist.items.some(
+        (item) => item.property.toString() === data.itemId
       );
-      if (existingItem) {
-        existingItem.note = note; // Atualiza a nota se o item já existir
-      } else {
-        user.wishList.push({ property: itemId, note });
+      if (isItemAlreadyInWishlist) {
+        return "Item already in wishlist";
       }
-      await user.save();
-      return user.wishList;
+
+      const item = {
+        property: data.itemId,
+        note: data.note,
+      };
+      wishlist.items.push(item);
+
+      await wishlist.save();
+
+      return wishlist;
     } catch (error) {
       throw new Error("Problem in adding item to wishlist " + error);
     }
