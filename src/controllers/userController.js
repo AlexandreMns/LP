@@ -90,4 +90,33 @@ export class UserController {
         .json({ message: error.message });
     }
   };
+
+  updateUser = async (req, res) => {
+    try {
+      const data = {
+        userId: req.user,
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+      };
+      const response = await this.userServices.updateUser(data);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
+
+  deleteUser = async (req, res) => {
+    try {
+      const data = req.user;
+      const response = await this.userServices.deleteUser(data);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
 }

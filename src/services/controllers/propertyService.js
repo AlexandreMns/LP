@@ -1,10 +1,12 @@
 import { Property } from "../../models/propertyModel.js";
 import { createProperty } from "../../utils/dataUtil.js";
+import { Wishlist } from "../../models/wishlistModel.js";
 
 export class PropertyService {
   async addProperty(data) {
     try {
       const property = await createProperty(data);
+
       return property;
     } catch (error) {
       throw new Error("Problem in the addProperty " + error);
@@ -108,9 +110,33 @@ export class PropertyService {
   async getPropertyById(data) {
     try {
       const property = await Property.findById(data);
+      if (!property) {
+        return "Property not found";
+      }
       return property;
     } catch (error) {
       throw new Error("Problem in fetching property by id " + error);
+    }
+  }
+
+  // Método para deletar uma propriedade ver se nao tem que eliminar todos os relatorios associados a essa propriedade e outras coisas
+  async deleteProperty(data) {
+    try {
+      // Primeiro, encontra e deleta a propriedade
+      const property = await Property.findByIdAndDelete(data);
+      if (!property) {
+        return "Property not found";
+      }
+
+      // Remove todos os itens das wishlists que contêm essa propriedade
+      await Wishlist.updateMany(
+        { "items.property": data }, // Procura wishlists que contenham a propriedade
+        { $pull: { items: { property: data } } } // Remove o item que contém a propriedade
+      );
+
+      return "Property deleted and related wishlist items removed successfully";
+    } catch (error) {
+      throw new Error("Problem in deleting property: " + error);
     }
   }
 }
