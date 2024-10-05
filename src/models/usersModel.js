@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
   resetPasswordToken: { type: String }, //User
   phone: { type: String }, //User ?
   agentLicense: { type: String }, //Agent
-  employer: { type: String },
+  employer: { type: String }, // Agent
   wishlist: { type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" },
 });
 

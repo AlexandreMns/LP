@@ -29,4 +29,7 @@ router.get("/me", verifyToken, userController.me);
 //Get user by id
 router.get("/:id", verifyToken, userController.userById);
 
+//Update user information
+router.put("/update", verifyToken, userController.updateUser);
+
 export default router;

@@ -155,4 +155,69 @@ export class UserService {
       throw new Error("Problem in fetching user " + error);
     }
   }
+
+  async updateUser(data) {
+    try {
+      const userId = data.userId;
+
+      // Busca o usuário pelo ID
+      const user = await User.findById(userId);
+      if (!user) {
+        return "User not found";
+      }
+
+      let isUpdated = false; // Flag para verificar se algum campo foi atualizado
+
+      // Verifica se o e-mail está sendo atualizado
+      if (data.email) {
+        if (data.email === user.email) {
+          return "The provided email is already the current email.";
+        }
+        const existingUserWithEmail = await User.findOne({
+          email: data.email,
+          _id: { $ne: userId },
+        });
+        if (existingUserWithEmail) {
+          return "Email is already in use by another user";
+        }
+        user.email = data.email;
+        isUpdated = true;
+      }
+
+      // Verifica se o telefone está sendo atualizado
+      if (data.phone) {
+        if (data.phone === user.phone) {
+          return "The provided phone number is already the current phone number.";
+        }
+        const existingUserWithPhone = await User.findOne({
+          phone: data.phone,
+          _id: { $ne: userId },
+        });
+        if (existingUserWithPhone) {
+          return "Phone number is already in use by another user";
+        }
+        user.phone = data.phone;
+        isUpdated = true;
+      }
+
+      // Atualiza o nome apenas se estiver presente no 'data'
+      if (data.name) {
+        if (data.name === user.name) {
+          return "The provided name is already the current name.";
+        }
+        user.name = data.name;
+        isUpdated = true;
+      }
+
+      // Verifica se algo foi atualizado
+      if (isUpdated) {
+        await user.save(); // Salva o usuário apenas se houver mudanças
+        return "User updated successfully";
+      } else {
+        return "No changes detected, user not updated.";
+      }
+    } catch (error) {
+      throw new Error("Problem in updating user: " + error);
+    }
+  }
 }
