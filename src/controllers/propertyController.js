@@ -68,4 +68,16 @@ export class PropertyController {
       res.status(500).json({ error: error.message });
     }
   };
+
+  deleteProperty = async (req, res) => {
+    try {
+      const data = req.params.id;
+      const property = await this.propertyService.deleteProperty(data);
+      res.status(HttpStatus.OK).json(property);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  };
 }

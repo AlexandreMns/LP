@@ -220,4 +220,17 @@ export class UserService {
       throw new Error("Problem in updating user: " + error);
     }
   }
+  /*
+  async deleteUser(data) {
+    try {
+      const userId = data;
+      const user = await User.findById(userId);
+      if (!user) {
+        return "User not found";
+      }
+      return;
+    } catch (error) {
+      throw new Error("Problem in deleting user " + error);
+    }
+  }*/
 }

@@ -107,4 +107,16 @@ export class UserController {
         .json({ message: error.message });
     }
   };
+
+  deleteUser = async (req, res) => {
+    try {
+      const data = req.user;
+      const response = await this.userServices.deleteUser(data);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
 }

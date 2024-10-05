@@ -32,4 +32,12 @@ router.get("/:id", verifyToken, userController.userById);
 //Update user information
 router.put("/update", verifyToken, userController.updateUser);
 
+//Delete user
+router.delete("/delete", verifyToken, userController.deleteUser); // Falta fazer
+
+/* Falta implementar licencia de agente para fazer esta rota
+//Promotion Request
+router.post("/promotion-request", verifyToken, userController.promotionRequest);
+*/
+
 export default router;

@@ -29,4 +29,12 @@ router.post(
   propertyController.addProperty
 );
 
+//Delete a Property
+router.delete(
+  "/delete/:id",
+  verifyToken,
+  authorize(roles.AGENT),
+  propertyController.deleteProperty
+);
+
 export default router;
