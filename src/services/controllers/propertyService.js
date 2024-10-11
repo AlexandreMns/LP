@@ -139,4 +139,22 @@ export class PropertyService {
       throw new Error("Problem in deleting property: " + error);
     }
   }
+
+  
+  async reserveProperty(propertyId) {
+    try {
+      const property = await Property.findOneAndUpdate(
+        { _id: propertyId },
+        { status: 'reservado' },
+        { new: true }
+      );
+      if (!property) {
+        throw new Error('Property not found');
+      }
+      return property;
+    } catch (error) {
+      throw new Error('Problem in reserving property: ' + error.message);
+    }
+  }
+
 }

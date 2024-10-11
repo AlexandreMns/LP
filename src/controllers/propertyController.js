@@ -80,4 +80,15 @@ export class PropertyController {
         .json({ error: error.message });
     }
   };
+
+  reserveProperty = async (req, res) => {
+    try {
+      const propertyId = req.params.id;
+      const updatedProperty = await this.propertyService.reserveProperty(propertyId);
+      res.status(200).json(updatedProperty);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
 }

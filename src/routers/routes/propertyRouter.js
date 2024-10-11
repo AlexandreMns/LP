@@ -37,6 +37,8 @@ router.delete(
   propertyController.deleteProperty
 );
 
+router.put("/reserve/:id", verifyToken, authorize(roles.AGENT), propertyController.reserveProperty);
+
 
 
 export default router;
