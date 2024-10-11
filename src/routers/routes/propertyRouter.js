@@ -13,15 +13,15 @@ const propertyController = new PropertyController(propertyService);
 
 // ==========================PUBLIC ROUTES==========================
 
-//Get all propertys
+// Get all properties
 router.get("/all/", verifyToken, propertyController.allProperties);
 
-//Get property by id
+// Get property by id
 router.get("/:id", verifyToken, propertyController.getPropertyById);
 
 // ==========================AGENT ROUTES==========================
 
-//Create a new Property
+// Create a new Property
 router.post(
   "/add",
   verifyToken,
@@ -29,12 +29,14 @@ router.post(
   propertyController.addProperty
 );
 
-//Delete a Property
+// Delete a Property
 router.delete(
   "/delete/:id",
   verifyToken,
   authorize(roles.AGENT),
   propertyController.deleteProperty
 );
+
+
 
 export default router;

@@ -25,7 +25,6 @@ export class AdminService {
   }
 
   async getDashboardData() {
-    // Exemplo de lógica para obter dados do dashboard
     //Mudar muita coisa aqui
     const totalUsers = await User.countDocuments();
     const totalProperties = await Property.countDocuments();
