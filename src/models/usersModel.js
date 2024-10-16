@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
   }, //User
   resetPasswordToken: { type: String }, //User
   phone: { type: String }, //User ?
-  agentLicense: { type: String }, //Agent
+  agentLicense: { type: mongoose.Schema.Types.ObjectId, ref: "AgentLicense" }, //Agent
   employer: { type: String }, // Agent
   wishlist: { type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" },
 });

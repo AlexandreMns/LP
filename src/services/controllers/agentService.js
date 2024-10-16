@@ -6,4 +6,16 @@ export class AgentService {
     const properties = await Property.find({ agent: agentId });
     return properties;
   }
+
+  async createAgentLicense(user, licenseData) {
+    // Criação de uma nova licença de agente
+    const agentLicense = new AgentLicense({
+      ...licenseData,
+      holder: user._id, // Associa a licença ao usuário
+    });
+
+    await agentLicense.save();
+    return agentLicense;
+  }
+
 }

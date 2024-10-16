@@ -18,4 +18,6 @@ router.get(
   agentController.getProperties
 );
 
+router.post("/license", verifyToken, agentController.createAgentLicense);
+
 export default router;
