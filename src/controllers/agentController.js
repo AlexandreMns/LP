@@ -1,5 +1,6 @@
 import { HttpStatus } from "../utils/httpStatus.js";
 import { User, roles } from "../models/usersModel.js";
+import  AgentLicense  from "../models/agentLicense.js";
 
 export class AgentController {
   constructor(agentService) {
@@ -65,7 +66,7 @@ export class AgentController {
   deleteAgentLicense = async (req, res) => {
     try {
       const userId = req.user; // Usuário autenticado via token
-      const agentId = req.query.agentId; // ID do agente vindo dos parâmetros de query
+      const { agentId } = req.body; // ID do agente vindo do corpo da requisição (raw)
   
       // Verifica se o usuário tem o papel de 'admin'
       const adminUser = await User.findById(userId);
@@ -73,7 +74,7 @@ export class AgentController {
         return res.status(HttpStatus.FORBIDDEN).json({ message: "User is not an admin" });
       }
   
-      // Busca o agente pelo ID fornecido no parâmetro de query
+      // Busca o agente pelo ID fornecido no corpo da requisição
       const agentUser = await User.findById(agentId);
       if (!agentUser) {
         return res.status(HttpStatus.NOT_FOUND).json({ message: "Agent not found" });
@@ -98,6 +99,54 @@ export class AgentController {
     }
   };
 
+  // Método para buscar a licença de um agente pelo token (logado)
+  getAgentLicense = async (req, res) => {
+    try {
+      const userId = req.user; // Usuário autenticado via token
+
+      // Verifica se o usuário tem o papel de 'agent'
+      const user = await User.findById(userId);
+      if (!user || user.role !== roles.AGENT) {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: "User is not an agent" });
+      }
+
+      // Verifica se o agente possui uma licença
+      if (!user.agentLicense) {
+        return res.status(HttpStatus.NOT_FOUND).json({ message: "Agent does not have a license" });
+      }
+
+      const agentLicense = await AgentLicense.findById(user.agentLicense);
+
+      res.status(HttpStatus.OK).json(agentLicense);
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  };
+
+  
+  getAllAgentLicenses = async (req, res) => {
+    try {
+      const userId = req.user; // Usuário autenticado via token
+
+      // Verifica se o usuário tem o papel de 'admin'
+      const user = await User.findById(userId);
+      if (!user || user.role !== roles.ADMIN) {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: "User is not an admin" });
+      }
+
+      const agentLicenses = await AgentLicense.find();
+
+      res.status(HttpStatus.OK).json(agentLicenses);
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  };
+  
+  
+  async getAllAgentLicenses () {
+    const licenses = await AgentLicense.find();
+    return licenses;
+  }
   
 
 }
