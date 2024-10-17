@@ -18,4 +18,14 @@ router.get(
   agentController.getProperties
 );
 
+router.post("/license", verifyToken, authorize(roles.ADMIN), agentController.createAgentLicense);
+
+//pelo token do usuário, pega a licença do agente
+router.get("/license", verifyToken, authorize(roles.AGENT), agentController.getAgentLicense);
+
+router.delete("/license", verifyToken, authorize(roles.ADMIN), agentController.deleteAgentLicense);
+
+router.get("/licenses", verifyToken, authorize(roles.ADMIN), agentController.getAllAgentLicenses);
+
+
 export default router;
