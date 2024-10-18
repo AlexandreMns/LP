@@ -2,6 +2,8 @@ import { Router } from "express";
 import { UserController } from "../../controllers/userController.js";
 import { UserService } from "../../services/controllers/userService.js";
 import { verifyToken } from "../../middlewares/verifyToken.js";
+import authorize from "../../middlewares/authorize.js";
+import { roles } from "../../models/usersModel.js";
 
 const router = Router();
 const userService = new UserService();
@@ -24,16 +26,31 @@ router.post("/forgot-password", verifyToken, userController.forgotPassword); //?
 // ==========================PRIVATE ROUTES==========================
 
 //Get user information
-router.get("/me", verifyToken, userController.me);
+router.get("/me", verifyToken, authorize(roles.CLIENT), userController.me);
 
 //Get user by id
-router.get("/:id", verifyToken, userController.userById);
+router.get(
+  "/:id",
+  verifyToken,
+  authorize(roles.CLIENT),
+  userController.userById
+);
 
 //Update user information
-router.put("/update", verifyToken, userController.updateUser);
+router.put(
+  "/update",
+  verifyToken,
+  authorize(roles.CLIENT),
+  userController.updateUser
+);
 
 //Delete user
-router.delete("/delete", verifyToken, userController.deleteUser); // Falta fazer
+router.delete(
+  "/delete",
+  verifyToken,
+  authorize(roles.CLIENT),
+  userController.deleteUser
+); // Falta fazer
 
 /* Falta implementar licencia de agente para fazer esta rota
 //Promotion Request
