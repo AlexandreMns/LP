@@ -9,17 +9,6 @@ const router = Router();
 const adminService = new AdminService();
 const adminController = new AdminController(adminService);
 
-
-// ==========================MODERATOR & ADMIN ROUTES==========================
-
-// Get all users
-router.get(
-  "/all",
-  verifyToken,
-  authorize(roles.AGENT),
-  adminController.allUsers
-);
-
 // ==========================ADMIN ROUTES==========================
 
 // Change user role
@@ -28,6 +17,14 @@ router.put(
   verifyToken,
   authorize(roles.ADMIN),
   adminController.changeRoles
+);
+
+// Get all users
+router.get(
+  "/all",
+  verifyToken,
+  authorize(roles.ADMIN),
+  adminController.allUsers
 );
 
 // Get dashboard data
@@ -47,9 +44,19 @@ router.post(
 );
 
 // Delete a user
-router.delete('/delete-user/:userId', verifyToken, authorize(roles.ADMIN), adminController.deleteUser);
+router.delete(
+  "/delete-user/:userId",
+  verifyToken,
+  authorize(roles.ADMIN),
+  adminController.deleteUser
+);
 
 //Get user by Id
-router.get('/user/:userId', verifyToken, authorize(roles.ADMIN), adminController.getUserById);
+router.get(
+  "/user/:userId",
+  verifyToken,
+  authorize(roles.ADMIN),
+  adminController.getUserById
+);
 
 export default router;

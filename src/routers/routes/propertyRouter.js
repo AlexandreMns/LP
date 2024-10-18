@@ -9,8 +9,6 @@ const router = Router();
 const propertyService = new PropertyService();
 const propertyController = new PropertyController(propertyService);
 
-// ==========================PROPERTY ROUTES==========================
-
 // ==========================PUBLIC ROUTES==========================
 
 // Get all properties
@@ -37,8 +35,11 @@ router.delete(
   propertyController.deleteProperty
 );
 
-router.put("/reserve/:id", verifyToken, authorize(roles.AGENT), propertyController.reserveProperty);
-
-
+router.put(
+  "/reserve/:id",
+  verifyToken,
+  authorize(roles.AGENT),
+  propertyController.reserveProperty
+);
 
 export default router;
