@@ -84,11 +84,36 @@ export class PropertyController {
   reserveProperty = async (req, res) => {
     try {
       const propertyId = req.params.id;
-      const updatedProperty = await this.propertyService.reserveProperty(propertyId);
+      const updatedProperty =
+        await this.propertyService.reserveProperty(propertyId);
       res.status(200).json(updatedProperty);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
 
+  getSoldProperties = async (req, res) => {
+    try {
+      const data = {
+        page: req.query.page || 1,
+        limit: req.query.limit || 10,
+        sort: req.query.sort || "price",
+        type: req.query.type,
+        search: req.query.search,
+        bedrooms: req.query.bedrooms,
+        bathrooms: req.query.bathrooms,
+        minPrice: req.query.minPrice,
+        maxPrice: req.query.maxPrice,
+        minSize: req.query.minSize,
+        maxSize: req.query.maxSize,
+        features: req.query.features,
+      };
+      const response = await this.propertyService.getSoldProperties(data);
+      res.status(HttpStatus.OK).json(response);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
+    }
+  };
 }
