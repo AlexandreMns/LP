@@ -1,7 +1,8 @@
 import { Property } from "../../models/propertyModel.js";
 import { User } from "../../models/usersModel.js";
+import objectValidId from "../../utils/idObjectValid.js";
+import { IDfinder } from "../../utils/idFinder.js";
 import { Report } from "../../models/reportModel.js";
-import { reportPagination } from "../../utils/dataUtil.js";
 
 export class ReportService {
   async addReport(data) {
@@ -22,19 +23,11 @@ export class ReportService {
 
   async getReportById(data) {
     try {
-      const report = await this.findReportById(data);
+      const report = await Report.findById(data);
       if (!report) {
         return "Report not found";
       }
       return report;
-    } catch (error) {
-      throw new Error("Error fetching report: " + error.message);
-    }
-  }
-
-  async findReportById(data) {
-    try {
-      return await Report.findById(data);
     } catch (error) {
       throw new Error("Error fetching report: " + error.message);
     }
@@ -59,48 +52,269 @@ export class ReportService {
 
   async getReportByProperty(data) {
     try {
-      const property = await Property.findById(data);
+      const isValid = objectValidId(data.id);
+      if (!isValid) {
+        return "Invalid ID";
+      }
+
+      const property = await Property.findById(data.id);
       if (!property) {
         return "Property not found";
       }
-      return await this.getReportsByField("property", data);
+
+      let filter = { property: property._id }; // Define que a busca deve ser por relatórios do agente
+
+      // Se uma string de busca foi fornecida, aplica a busca nos campos relacionados
+      if (data.search) {
+        // Pesquisa por usuários
+        const users = await User.find({
+          $or: [
+            { name: new RegExp(data.search, "i") }, // Pesquisa pelo nome do usuário
+            { email: new RegExp(data.search, "i") }, // Pesquisa pelo email
+          ],
+        });
+
+        // Coleta IDs correspondentes
+        const userIds = users.map((user) => user._id); // IDs dos usuários encontrados
+
+        // Adiciona as condições de pesquisa ao filtro
+        filter.$or = [
+          { client: { $in: userIds } }, // Relatórios com clientes que correspondem à busca
+          { agent: { $in: userIds } }, // Relatórios com agentes que correspondem à busca
+          { description: new RegExp(data.search, "i") }, // Relatórios que correspondem à descrição
+        ];
+      }
+
+      // Conta o total de relatórios correspondentes ao filtro
+      const totalReports = await Report.countDocuments(filter);
+
+      // Calcula o total de páginas
+      const totalPages = Math.ceil(totalReports / data.limit);
+
+      // Verifica se a página solicitada é maior que o número de páginas disponíveis
+      if (data.page > totalPages) {
+        // Redireciona para a última página disponível
+        data.page = totalPages;
+      }
+
+      // Caso o número da página seja inferior a 1, redireciona para a primeira página
+      if (data.page < 1) {
+        data.page = 1;
+      }
+
+      // Consulta os relatórios com paginação e filtro de busca
+      const reports = await Report.find(filter)
+        .skip((data.page - 1) * data.limit)
+        .limit(data.limit);
+
+      if (reports.length === 0) {
+        return "No reports found";
+      }
+
+      // Retorna os relatórios paginados e o total de resultados
+      return {
+        reports,
+        totalReports,
+        totalPages: Math.ceil(totalReports / data.limit),
+        currentPage: data.page,
+      };
     } catch (error) {
       throw new Error("Error fetching reports by property: " + error.message);
     }
   }
-
+  /* Nao esta a ser usado
   async getReportByClient(data) {
     try {
-      const client = await User.findById(data);
-      console.log(data);
+      const client = await User.findById(data.id);
       if (!client) {
         return "Client not found";
       }
-      return await this.getReportsByField("client", data);
+      const reports = await Report.find({ client: data.id })
+        .skip((data.page - 1) * data.limit)
+        .limit(data.limit);
+      if (reports.length === 0) {
+        return "No reports found";
+      }
+      const totalReports = await Report.countDocuments({ client: data.id });
+      return {
+        reports,
+        totalReports,
+        totalPages: Math.ceil(totalReports / data.limit),
+        currentPage: data.page,
+      };
     } catch (error) {
       throw new Error("Error fetching reports by client: " + error.message);
     }
   }
+    */
 
   async getReportByAgent(data) {
     try {
-      const agent = await User.findById(data);
+      const isValid = objectValidId(data.id);
+      if (!isValid) {
+        return "Invalid ID";
+      }
+      // Verifica se o agente existe
+      const agent = await User.findById(data.id);
       if (!agent) {
         return "Agent not found";
       }
-      return await this.getReportsByField("agent", data);
+
+      let filter = { agent: agent._id }; // Define que a busca deve ser por relatórios do agente
+
+      // Se uma string de busca foi fornecida, aplica a busca nos campos relacionados
+      if (data.search) {
+        // Pesquisa por usuários
+        const users = await User.find({
+          $or: [
+            { name: new RegExp(data.search, "i") }, // Pesquisa pelo nome do usuário
+            { email: new RegExp(data.search, "i") }, // Pesquisa pelo email
+          ],
+        });
+
+        // Pesquisa por propriedades
+        const properties = await Property.find({
+          $or: [
+            { street: new RegExp(data.search, "i") }, // Pesquisa pelo nome da rua
+            { city: new RegExp(data.search, "i") }, // Pesquisa pela cidade
+            { description: new RegExp(data.search, "i") }, // Pesquisa pela descrição da propriedade
+          ],
+        });
+
+        // Coleta IDs correspondentes
+        const userIds = users.map((user) => user._id); // IDs dos usuários encontrados
+        const propertyIds = properties.map((property) => property._id); // IDs das propriedades encontradas
+
+        // Adiciona as condições de pesquisa ao filtro
+        filter.$or = [
+          { client: { $in: userIds } }, // Relatórios com clientes que correspondem à busca
+          { property: { $in: propertyIds } }, // Relatórios com propriedades que correspondem à busca
+          { description: new RegExp(data.search, "i") }, // Relatórios que correspondem à descrição
+        ];
+      }
+
+      // Conta o total de relatórios correspondentes ao filtro
+      const totalReports = await Report.countDocuments(filter);
+
+      // Calcula o total de páginas
+      const totalPages = Math.ceil(totalReports / data.limit);
+
+      // Verifica se a página solicitada é maior que o número de páginas disponíveis
+      if (data.page > totalPages) {
+        // Redireciona para a última página disponível
+        data.page = totalPages;
+      }
+
+      // Caso o número da página seja inferior a 1, redireciona para a primeira página
+      if (data.page < 1) {
+        data.page = 1;
+      }
+
+      // Consulta os relatórios com paginação e filtro de busca
+      const reports = await Report.find(filter)
+        .skip((data.page - 1) * data.limit)
+        .limit(data.limit);
+
+      if (reports.length === 0) {
+        return "No reports found";
+      }
+
+      // Retorna os relatórios paginados e o total de resultados
+      return {
+        reports,
+        totalReports,
+        totalPages: Math.ceil(totalReports / data.limit),
+        currentPage: data.page,
+      };
     } catch (error) {
-      throw new Error("Error fetching reports by client: " + error.message);
+      throw new Error("Error fetching reports by agent: " + error.message);
     }
   }
 
   async getMyReports(data) {
     try {
+      // Encontra o usuário logado pelo ID
       const user = await User.findById(data.user);
       if (!user) {
         return "User not found";
       }
-      return await reportPagination(data);
+
+      // Define o filtro base para relatórios
+      let filter = {};
+
+      // Se não houver data.id, filtra de acordo com o papel do usuário logado
+      if (user.role === "client") {
+        filter.client = user._id;
+      } else if (user.role === "agent") {
+        filter.agent = user._id;
+      }
+
+      // Se uma string de busca foi fornecida, aplica a busca nos campos relacionados
+      if (data.search) {
+        // Pesquisa por usuários (cliente ou agente)
+        const users = await User.find({
+          $or: [
+            { name: new RegExp(data.search, "i") }, // Pesquisa pelo nome do usuário (cliente ou agente)
+            { email: new RegExp(data.search, "i") }, // Pesquisa pelo email
+          ],
+        });
+
+        // Pesquisa por propriedades
+        const properties = await Property.find({
+          $or: [
+            { street: new RegExp(data.search, "i") }, // Pesquisa pelo nome da rua
+            { city: new RegExp(data.search, "i") }, // Pesquisa pela cidade
+            { description: new RegExp(data.search, "i") }, // Pesquisa pela descrição da propriedade
+          ],
+        });
+
+        // Coletar IDs correspondentes
+        const userIds = users.map((user) => user._id);
+        const propertyIds = properties.map((property) => property._id);
+
+        // Adiciona a pesquisa ao filtro
+        filter.$or = [
+          { client: { $in: userIds } }, // Relatórios com clientes que correspondem à busca
+          { agent: { $in: userIds } }, // Relatórios com agentes que correspondem à busca
+          { property: { $in: propertyIds } }, // Relatórios com propriedades que correspondem à busca
+          { description: new RegExp(data.search, "i") }, // Relatórios que correspondem à descrição
+        ];
+      }
+
+      // Conta o total de relatórios correspondentes ao filtro
+      const totalReports = await Report.countDocuments(filter);
+
+      // Calcula o total de páginas
+      const totalPages = Math.ceil(totalReports / data.limit);
+
+      // Verifica se a página solicitada é maior que o número de páginas disponíveis
+      if (data.page > totalPages) {
+        // Redireciona para a última página disponível
+        data.page = totalPages;
+      }
+
+      // Caso o número da página seja inferior a 1, redireciona para a primeira página
+      if (data.page < 1) {
+        data.page = 1;
+      }
+
+      // Consulta com paginação e filtros
+      const reports = await Report.find(filter)
+        .skip((data.page - 1) * data.limit)
+        .limit(data.limit);
+
+      // Verifica se relatórios foram encontrados
+      if (reports.length === 0) {
+        return "No reports found";
+      }
+
+      // Retorna os relatórios paginados e o total de resultados
+      return {
+        reports,
+        totalReports,
+        totalPages: Math.ceil(totalReports / data.limit),
+        currentPage: data.page,
+      };
     } catch (error) {
       throw new Error("Error fetching reports: " + error.message);
     }
@@ -116,49 +330,15 @@ export class ReportService {
     }
   }
 
-  /* Nao esta a ser usado
-  async updateReport(data) {
-    try {
-      const report = await Report.findByIdAndUpdate(data.reportId, data, {
-        new: true,
-      });
-      if (!report) return "Report not found";
-      return report;
-    } catch (error) {
-      throw new Error("Error updating report: " + error.message);
-    }
-  }
-    */
-
   async deleteReport(id) {
     try {
       const result = await Report.deleteOne({ _id: id });
-      if (result.deletedCount === 0) throw new Error("Report not found");
+      if (result.deletedCount === 0) {
+        return "Report not found";
+      }
       return "Report deleted successfully";
     } catch (error) {
       throw new Error("Error deleting report: " + error.message);
     }
   }
-
-  async getReports(data) {
-    try {
-      const options = {
-        skip: (data.page - 1) * data.limit,
-        limit: parseInt(data.limit),
-      };
-      const reports = await Report.find({}, null, options);
-      const total = await Report.countDocuments({});
-      const payload = {
-        reports,
-        total,
-        page: parseInt(data.page),
-        pages: Math.ceil(total / data.limit),
-      };
-      return payload;
-    } catch (error) {
-      throw new Error("Error fetching reports: " + error.message);
-    }
-  }
 }
-
-export default new ReportService();

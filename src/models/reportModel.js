@@ -8,12 +8,12 @@ const ReportSchema = new mongoose.Schema({
   },
   client: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Client",
+    ref: "User",
     required: true,
   },
   agent: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Agent",
+    ref: "User",
     required: true,
   },
   saleDate: {
