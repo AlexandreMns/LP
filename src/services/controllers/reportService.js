@@ -11,7 +11,6 @@ export class ReportService {
         User.findOne({ email: data.client }), // Fetch client details
       ]);
 
-      //fazer add report ser com email e nao com id
       if (!property) {
         return "Property not found";
       }
