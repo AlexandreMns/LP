@@ -1,7 +1,10 @@
 import { roles, User } from "../../models/usersModel.js";
 import { Property } from "../../models/propertyModel.js";
 import { dataRole } from "../../utils/dataUtil.js";
+import { Report } from "../../models/reportModel.js";
+import { AgentLicense } from "../../models/agentLicense.js";
 import { createPassword } from "../../utils/passwordUtil.js";
+import { parse } from "dotenv";
 
 export class AdminService {
   async changeRoles(data) {
@@ -26,19 +29,37 @@ export class AdminService {
 
   async getDashboardData() {
     //Mudar muita coisa aqui
-    const totalUsers = await User.countDocuments();
-    const totalProperties = await Property.countDocuments();
-    const totalClientes = await User.countDocuments({ role: "client" });
-    const totalAgentes = await User.countDocuments({ role: "agent" });
-    const totalAdmins = await User.countDocuments({ role: "admin" });
+    try {
+      const [
+        totalUsers,
+        totalProperties,
+        totalReports,
+        totalAgentLicenses,
+        totalAdmins,
+        totalAgentes,
+        totalClientes,
+      ] = await Promise.all([
+        User.countDocuments(),
+        User.countDocuments({ role: roles.CLIENT }),
+        User.countDocuments({ role: roles.AGENT }),
+        User.countDocuments({ role: roles.ADMIN }),
+        Property.countDocuments(),
+        Report.countDocuments(),
+        AgentLicense.countDocuments(),
+      ]);
 
-    return {
-      totalUsers,
-      totalProperties,
-      totalClientes,
-      totalAgentes,
-      totalAdmins,
-    };
+      return {
+        totalUsers,
+        totalProperties,
+        totalClientes,
+        totalReports,
+        totalAgentLicenses,
+        totalAgentes,
+        totalAdmins,
+      };
+    } catch (error) {
+      throw new Error("Problem in fetching dashboard data " + error);
+    }
   }
 
   async createUser(userData) {
@@ -52,11 +73,11 @@ export class AdminService {
     try {
       const result = await User.deleteOne({ _id: userId });
       if (result.deletedCount === 0) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
-      return "User deleted successfully"
+      return "User deleted successfully";
     } catch (error) {
-      throw new Error ('Problem in deleting user ' + error);
+      throw new Error("Problem in deleting user " + error);
     }
   }
 
@@ -97,8 +118,6 @@ export class AdminService {
 
   async allUsers(data) {
     try {
-      const skip = (data.page - 1) * data.limit;
-
       const filter = {};
 
       if (data.role) {
@@ -111,19 +130,34 @@ export class AdminService {
         ];
       }
 
+      // Conta o número total de propriedades que correspondem aos filtros
+      const total = await User.countDocuments(filter);
+
+      // Calcula o número total de páginas
+      const totalPages = Math.ceil(total / data.limit);
+
+      // Verifica se a página solicitada é maior que o número de páginas disponíveis
+      if (data.page > totalPages) {
+        // Redireciona para a última página disponível
+        data.page = totalPages;
+      }
+
+      // Verifica se o número da página é menor que 1
+      if (data.page < 1) {
+        data.page = 1; // Redireciona para a primeira página
+      }
+
       const users = await User.find(filter)
-        .skip(skip)
-        .limit(Number(data.limit)); // Aplicar paginação
-      const total = await User.countDocuments(filter); // Total de usuários filtrados
+        .skip((data.page - 1) * data.limit) // Pular documentos
+        .limit(parseInt(data.limit)); // Aplicar paginação
 
       const payload = await Promise.all(
         users.map((user) => dataRole(user._id)) // Buscar dados do papel para cada usuário
       );
       return {
-        data: payload,
+        payload,
         total,
-        page: Number(data.page),
-        limit: Number(data.limit),
+        page: parseInt(data.page),
         pages: Math.ceil(total / data.limit),
       };
     } catch (error) {
@@ -132,13 +166,13 @@ export class AdminService {
   }
 
   async getUserById(data) {
-    try{
+    try {
       const user = await User.findById(data);
-      if(!user){
+      if (!user) {
         return "User not found";
       }
       return user;
-    }catch(error){
+    } catch (error) {
       throw new Error("Problem in fetching user by id " + error);
     }
   }
