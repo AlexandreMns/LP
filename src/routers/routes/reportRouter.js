@@ -10,39 +10,18 @@ const reportService = new ReportService();
 const reportController = new ReportController(reportService);
 
 // ==========================CLIENT ROUTES==========================
+
+//Get my reports
 router.get(
   "/my-reports/",
   verifyToken,
   authorize(roles.CLIENT),
   reportController.getMyReports
-  //funcao que faz ver os reports atravaez do token do cliente
-);
-
-router.get(
-  "/report/:id",
-  verifyToken,
-  authorize(roles.CLIENT),
-  reportController.getReportById
-  //caso tenha um report com esse id ele consegue ver o report
-);
-
-router.get(
-  "/property/:id",
-  verifyToken,
-  authorize(roles.CLIENT),
-  reportController.getReportByProperty
-  //fazer com que ele consege ver os reports atraves da propriedade se tiver algum report com essa propriedade
-);
-
-router.get(
-  "/agent/:id",
-  verifyToken,
-  authorize(roles.CLIENT),
-  reportController.getReportByAgent
-  //fazer com que ele consege ver os reports atraves do agente se tiver algum report com esse agente
 );
 
 // ==========================AGENT ROUTES==========================
+
+//Create a report
 router.post(
   "/add",
   verifyToken,
@@ -50,12 +29,40 @@ router.post(
   reportController.addReport
 );
 
-//Nao sei ate que ponto um agente pode eliminar os reports
+// ==========================ADMIN ROUTES==========================
+
+//Delete a report
 router.delete(
   "/delete/:id",
   verifyToken,
-  authorize(roles.AGENT),
+  authorize(roles.ADMIN),
   reportController.deleteReport
+);
+
+//Get report via id
+router.get(
+  "/report/:id",
+  verifyToken,
+  authorize(roles.ADMIN),
+  reportController.getReportById
+);
+
+//Get report via property id
+router.get(
+  "/property/",
+  verifyToken,
+  authorize(roles.ADMIN),
+  reportController.getReportByProperty
+  //fazer com que ele consege ver os reports atraves da propriedade se tiver algum report com essa propriedade
+);
+
+//Get report via agent id
+router.get(
+  "/agent/",
+  verifyToken,
+  authorize(roles.ADMIN),
+  reportController.getReportByAgent
+  //fazer com que ele consege ver os reports atraves do agente se tiver algum report com esse agente
 );
 
 export default router;

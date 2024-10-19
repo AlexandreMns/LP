@@ -74,21 +74,28 @@ export class PropertyService {
           { parish: regex },
         ];
       }
-      // Definir ordenação apenas se o `sort` for válido
-      const options = {};
-      if (data.sort && data.sort.trim() !== "") {
-        options.sort = data.sort; // Ordena apenas se sort for válido
+
+      // Conta o número total de propriedades que correspondem aos filtros
+      const total = await Property.countDocuments(query);
+
+      // Calcula o número total de páginas
+      const totalPages = Math.ceil(total / data.limit);
+
+      // Verifica se a página solicitada é maior que o número de páginas disponíveis
+      if (data.page > totalPages) {
+        // Redireciona para a última página disponível
+        data.page = totalPages;
+      }
+
+      // Verifica se o número da página é menor que 1
+      if (data.page < 1) {
+        data.page = 1; // Redireciona para a primeira página
       }
 
       // Paginação
-      options.skip = (data.page - 1) * data.limit;
-      options.limit = parseInt(data.limit);
-
-      // Buscar propriedades com filtros e opções de ordenação
-      const properties = await Property.find(query, null, options);
-
-      // Contar o número total de propriedades que correspondem aos filtros
-      const total = await Property.countDocuments(query);
+      const properties = await Property.find(query)
+        .skip((data.page - 1) * data.limit) // Pula os documentos da página anterior
+        .limit(parseInt(data.limit)); // Limita a quantidade de documentos retornados
 
       if (properties.length === 0) {
         return "No properties found";
@@ -98,7 +105,7 @@ export class PropertyService {
         properties,
         total,
         page: parseInt(data.page),
-        pages: Math.ceil(total / data.limit),
+        pages: totalPages,
       };
 
       return payload;
@@ -140,21 +147,19 @@ export class PropertyService {
     }
   }
 
-  
   async reserveProperty(propertyId) {
     try {
       const property = await Property.findOneAndUpdate(
         { _id: propertyId },
-        { status: 'reservado' },
+        { status: "reservado" },
         { new: true }
       );
       if (!property) {
-        throw new Error('Property not found');
+        throw new Error("Property not found");
       }
       return property;
     } catch (error) {
-      throw new Error('Problem in reserving property: ' + error.message);
+      throw new Error("Problem in reserving property: " + error.message);
     }
   }
-
 }

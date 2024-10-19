@@ -1,6 +1,6 @@
 import { Property } from "../../models/propertyModel.js";
 import { createProperty, dataRole } from "../../utils/dataUtil.js";
-import  AgentLicense  from "../../models/agentLicense.js";
+import { AgentLicense } from "../../models/agentLicense.js";
 
 export class AgentService {
   async getProperties(agentId) {
@@ -19,7 +19,6 @@ export class AgentService {
     return agentLicense;
   }
 
-
   async getAgentLicense(agentId) {
     // Busca a licença do agente
     const agentLicense = await AgentLicense.findById(agentId);
@@ -29,7 +28,7 @@ export class AgentService {
 
     return agentLicense;
   }
-  
+
   async deleteAgentLicense(user) {
     // Busca a licença do agente
     const agentLicense = await AgentLicense.findById(user.agentLicense);
@@ -41,7 +40,4 @@ export class AgentService {
     await agentLicense.remove();
     return "Agent license deleted successfully";
   }
-
-
-
 }

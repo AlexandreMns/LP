@@ -38,7 +38,13 @@ export class ReportController {
 
   getReportByProperty = async (req, res) => {
     try {
-      const data = req.params.id;
+      const data = {
+        user: req.user,
+        id: req.query.id,
+        page: req.query.page || 1,
+        limit: req.query.limit || 10,
+        search: req.query.search,
+      };
       const response = await this.reportService.getReportByProperty(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
@@ -50,7 +56,13 @@ export class ReportController {
 
   getReportByClient = async (req, res) => {
     try {
-      const data = req.params.id;
+      const data = {
+        user: req.user,
+        id: req.query.id,
+        page: req.query.page || 1,
+        limit: req.query.limit || 10,
+        search: req.query.search,
+      };
       const response = await this.reportService.getReportByClient(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
@@ -62,7 +74,13 @@ export class ReportController {
 
   getReportByAgent = async (req, res) => {
     try {
-      const data = req.params.id;
+      const data = {
+        user: req.user,
+        id: req.query.id,
+        page: req.query.page || 1,
+        limit: req.query.limit || 10,
+        search: req.query.search,
+      };
       const response = await this.reportService.getReportByAgent(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
@@ -78,7 +96,7 @@ export class ReportController {
         user: req.user,
         page: req.query.page || 1,
         limit: req.query.limit || 10,
-        id: req.query.id,
+        search: req.query.search,
       };
       const response = await this.reportService.getMyReports(data);
       res.status(HttpStatus.OK).json(response);
@@ -97,21 +115,6 @@ export class ReportController {
         sort: req.query.sort || "createdAt",
       };
       const response = await this.reportService.getAllReports(data);
-      res.status(HttpStatus.OK).json(response);
-    } catch (error) {
-      res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
-    }
-  };
-
-  updateReport = async (req, res) => {
-    try {
-      const data = {
-        reportId: req.params.id,
-        description: req.body.description,
-      };
-      const response = await this.reportService.updateReport(data);
       res.status(HttpStatus.OK).json(response);
     } catch (error) {
       res

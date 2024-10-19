@@ -7,7 +7,7 @@ const AgentLicenseSchema = new mongoose.Schema({
   issuingEntity: { type: String, required: true },
   licenseStatus: {
     type: String,
-    enum: ['active', 'suspended', 'revoked'],
+    enum: ["active", "suspended", "revoked"],
     required: true,
   },
   holder: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -15,4 +15,4 @@ const AgentLicenseSchema = new mongoose.Schema({
 
 const AgentLicense = mongoose.model("AgentLicense", AgentLicenseSchema);
 
-export default AgentLicense;
+export { AgentLicense };
