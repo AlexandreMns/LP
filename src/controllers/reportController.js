@@ -1,4 +1,5 @@
 import { HttpStatus } from "../utils/httpStatus.js";
+import { dataRole } from "../utils/dataUtil.js";
 
 export class ReportController {
   constructor(reportService) {
@@ -7,10 +8,23 @@ export class ReportController {
 
   addReport = async (req, res) => {
     try {
+      // Fetch the role of the current user (admin or agent)
+      const user = await dataRole(req.user);
+      const isAdmin = user.role === "admin";
+
+      // Assign the agent's ID based on the user's role
+      const agentId = isAdmin ? req.body.agent : req.user;
+
+      if (isAdmin && !req.body.agent) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: "Please select a valid agent" });
+      }
+
       const data = {
         property: req.body.property,
         client: req.body.client,
-        agent: req.user,
+        agent: agentId,
         description: req.body.description,
         saleValue: req.body.saleValue,
         saleDate: req.body.saleDate,

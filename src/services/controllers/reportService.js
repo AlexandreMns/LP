@@ -1,22 +1,38 @@
 import { Property } from "../../models/propertyModel.js";
 import { User } from "../../models/usersModel.js";
 import objectValidId from "../../utils/idObjectValid.js";
-import { IDfinder } from "../../utils/idFinder.js";
 import { Report } from "../../models/reportModel.js";
 
 export class ReportService {
   async addReport(data) {
     try {
-      const property = await Property.findById(data.property);
-      if (!property) return "Property not found";
+      const [property, client] = await Promise.all([
+        Property.findById(data.property), // Fetch property details
+        User.findOne({ email: data.client }), // Fetch client details
+      ]);
 
-      const client = await User.findById(data.client);
-      if (!client) return "Client not found";
+      //fazer add report ser com email e nao com id
+      if (!property) {
+        return "Property not found";
+      }
 
-      const report = new Report(data);
+      if (!client) {
+        return "Client not found";
+      }
+
+      // Create the report and update the property status
+      const report = new Report({
+        property: property._id,
+        client: client._id,
+        agent: data.agent,
+        description: data.description,
+        saleValue: data.saleValue,
+        saleDate: data.saleDate,
+      });
       property.status = "Sold";
-      await property.save();
-      await report.save();
+
+      await Promise.all([property.save(), report.save()]);
+
       return report;
     } catch (error) {
       throw new Error("Error during report registration: " + error.message);
