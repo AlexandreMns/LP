@@ -5,43 +5,43 @@ export const LoanCalculator = (
   interestRate,
   homeType
 ) => {
-  // Calcular o valor do empréstimo
+  // Calculate the loan amount
   const loanAmount = propertyValue - downPayment;
 
-  // Calcular a taxa de juro mensal
+  // Calculate the monthly interest rate
   const monthlyInterestRate = interestRate / 12;
 
-  // Número total de prestações (em meses)
+  // Total number of payments (in months)
   const numberOfPayments = years * 12;
 
-  // Calcular a prestação mensal
+  // Calculate the monthly payment
   const monthlyPayment =
     (loanAmount * monthlyInterestRate) /
     (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
 
-  // Calcular IMT com base no tipo de habitação (primária ou secundária)
+  // Calculate IMT based on the home type (primary or secondary)
   const imt = calculateIMT(propertyValue, homeType);
 
-  // Calcular imposto de selo
+  // Calculate stamp duty
   const stampDuty = calculateStampDuty(propertyValue);
 
-  // Calcular o total de impostos
+  // Calculate the total taxes
   const taxes = stampDuty + imt;
 
-  // Taxa de registo fixa
+  // Fixed registration fee
   const registrationFee = 350;
 
-  // Calcular o pagamento total (impostos + registo + valor total das prestações)
+  // Calculate the total payment (taxes + registration + total loan payments)
   const totalPayment =
     taxes + registrationFee + monthlyPayment * numberOfPayments;
 
-  // Calcular o total de crédito à habitação (empréstimo + impostos)
+  // Calculate the total mortgage (loan amount + taxes)
   const totalMortgage = loanAmount + taxes;
 
-  // Calcular a percentagem de financiamento
+  // Calculate the financing percentage
   const financing = (loanAmount / propertyValue) * 100;
 
-  // Retornar os valores calculados
+  // Return the calculated values
   return {
     loanAmount: loanAmount.toFixed(2),
     monthlyInterestRate: (monthlyInterestRate * 100).toFixed(2),
@@ -57,12 +57,12 @@ export const LoanCalculator = (
   };
 };
 
-// Função para calcular o IMT com base no valor do imóvel e no tipo de habitação
+// Function to calculate IMT based on property value and home type
 export const calculateIMT = (propertyValue, homeType) => {
   let rate, deduction;
 
-  if (homeType === "habitacaoPrimaria") {
-    // Tabela de IMT para habitação própria permanente
+  if (homeType === "primaryResidence") {
+    // IMT table for primary residence
     if (propertyValue <= 97064) {
       rate = 0;
       deduction = 0;
@@ -79,11 +79,11 @@ export const calculateIMT = (propertyValue, homeType) => {
       rate = 8;
       deduction = 11959.32;
     } else {
-      rate = 6; // Taxa fixa para valores acima de 603.576
+      rate = 6; // Fixed rate for values above 603,576
       deduction = 0;
     }
-  } else if (homeType === "habitacaoSecundaria") {
-    // Tabela de IMT para segunda habitação
+  } else if (homeType === "secondaryResidence") {
+    // IMT table for secondary residence
     if (propertyValue <= 97064) {
       rate = 1;
       deduction = 0;
@@ -100,19 +100,19 @@ export const calculateIMT = (propertyValue, homeType) => {
       rate = 8;
       deduction = 11287.28;
     } else {
-      rate = 6; // Taxa fixa para valores acima de 603.576
+      rate = 6; // Fixed rate for values above 603,576
       deduction = 0;
     }
   }
 
-  // Calcular o IMT
+  // IMT calculation
   let imt = propertyValue * (rate / 100) - deduction;
   return imt > 0 ? imt : 0;
 };
 
-// Função para calcular o imposto de selo
+// Function to calculate stamp duty
 export const calculateStampDuty = (propertyValue) => {
-  const stampDutyRate = 0.008; // 0,8%
+  const stampDutyRate = 0.008; // 0.8% rate
   let stampDuty = propertyValue * stampDutyRate;
   return stampDuty;
 };
