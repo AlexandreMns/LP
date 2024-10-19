@@ -15,7 +15,7 @@ const propertyController = new PropertyController(propertyService);
 router.get("/all/", verifyToken, propertyController.allProperties);
 
 // Get property by id
-router.get("/:id", verifyToken, propertyController.getPropertyById);
+router.get("/by-id/:id", verifyToken, propertyController.getPropertyById);
 
 // ==========================AGENT ROUTES==========================
 
@@ -42,4 +42,13 @@ router.put(
   propertyController.reserveProperty
 );
 
+// ==========================ADMIN ROUTES==========================
+
+// Get sold properties
+router.get(
+  "/sold/",
+  verifyToken,
+  authorize(roles.ADMIN),
+  propertyController.getSoldProperties
+);
 export default router;

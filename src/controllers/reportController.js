@@ -107,22 +107,6 @@ export class ReportController {
     }
   };
 
-  getAllReports = async (req, res) => {
-    try {
-      const data = {
-        page: req.query.page || 1,
-        limit: req.query.limit || 10,
-        sort: req.query.sort || "createdAt",
-      };
-      const response = await this.reportService.getAllReports(data);
-      res.status(HttpStatus.OK).json(response);
-    } catch (error) {
-      res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
-    }
-  };
-
   deleteReport = async (req, res) => {
     try {
       const data = req.params.id;

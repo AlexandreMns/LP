@@ -14,6 +14,8 @@ export class ReportService {
       if (!client) return "Client not found";
 
       const report = new Report(data);
+      property.status = "Sold";
+      await property.save();
       await report.save();
       return report;
     } catch (error) {
@@ -315,16 +317,6 @@ export class ReportService {
         totalPages: Math.ceil(totalReports / data.limit),
         currentPage: data.page,
       };
-    } catch (error) {
-      throw new Error("Error fetching reports: " + error.message);
-    }
-  }
-
-  async getAllReports() {
-    try {
-      const reports = await Report.find();
-      if (reports.length === 0) return "No reports found";
-      return reports;
     } catch (error) {
       throw new Error("Error fetching reports: " + error.message);
     }
