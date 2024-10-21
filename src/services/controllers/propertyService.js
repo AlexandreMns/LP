@@ -1,5 +1,6 @@
 import { Property } from "../../models/propertyModel.js";
-import { createProperty } from "../../utils/dataUtil.js";
+import { createProperty, dataRole, isValid } from "../../utils/dataUtil.js";
+import { roles, User } from "../../models/usersModel.js";
 import { Wishlist } from "../../models/wishlistModel.js";
 
 export class PropertyService {
@@ -16,6 +17,8 @@ export class PropertyService {
   async allProperties(data) {
     try {
       const query = {};
+
+      query.status = { $in: ["Available", "Reserved"] }; // Filtra propriedades disponíveis ou reservadas
 
       // Filtra por tipo de propriedade (house, apartment, land)
       if (data.type) {
@@ -267,4 +270,29 @@ export class PropertyService {
       throw new Error("Problem in fetching sold properties: " + error.message);
     }
   }
+
+  getAgentProperties = async (data) => {
+    try {
+      const valid = isValid(data);
+      if (!valid) {
+        throw new Error("Data is invalid");
+      }
+      const agent = await User.findById(data);
+      if (!agent) {
+        return "User not found";
+      }
+
+      if (agent.role !== roles.AGENT) {
+        return "User is not an agent";
+      }
+
+      const properties = await Property.find({ agent: data });
+      if (properties.length === 0) {
+        return "No properties found";
+      }
+      return properties;
+    } catch (error) {
+      throw new Error("Problem in fetching agent properties: " + error.message);
+    }
+  };
 }
