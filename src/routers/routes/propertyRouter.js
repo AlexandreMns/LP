@@ -17,6 +17,8 @@ router.get("/all/", verifyToken, propertyController.allProperties);
 // Get property by id
 router.get("/by-id/:id", verifyToken, propertyController.getPropertyById);
 
+router.get("/agent/:id", verifyToken, propertyController.getAgentProperties);
+
 // ==========================AGENT ROUTES==========================
 
 // Create a new Property

@@ -116,4 +116,16 @@ export class PropertyController {
         .json({ message: error.message });
     }
   };
+
+  getAgentProperties = async (req, res) => {
+    try {
+      const data = req.params.id;
+      const properties = await this.propertyService.getAgentProperties(data);
+      res.status(HttpStatus.OK).json(properties);
+    } catch (error) {
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  };
 }
