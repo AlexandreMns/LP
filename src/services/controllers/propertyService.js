@@ -18,6 +18,8 @@ export class PropertyService {
     try {
       const query = {};
 
+      query.status = { $in: ["Available", "Reserved"] }; // Filtra propriedades disponíveis ou reservadas
+
       // Filtra por tipo de propriedade (house, apartment, land)
       if (data.type) {
         query.type = data.type;
